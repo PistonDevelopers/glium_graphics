@@ -1,0 +1,24 @@
+[package]
+name = "glium_graphics"
+version = "0.0.1"
+authors = ["Eduard Bopp <eduard.bopp@aepsil0n.de>"]
+
+[dependencies.freetype-rs]
+git = "https://github.com/PistonDevelopers/freetype-rs"
+
+[dependencies.piston2d-graphics]
+git = "https://github.com/PistonDevelopers/graphics"
+
+[dependencies.glium_macros]
+git = "https://github.com/tomaka/glium"
+
+[dependencies.glium]
+git = "https://github.com/tomaka/glium"
+features = ["image", "gl_read_buffer"]
+default_features = false
+
+[dependencies.glutin]
+git = "https://github.com/tomaka/glutin"
+
+[dependencies.image]
+git = "https://github.com/PistonDevelopers/image"
