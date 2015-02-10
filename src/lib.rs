@@ -1,4 +1,4 @@
-#![feature(std_misc, plugin)]
+#![feature(plugin)]
 
 extern crate freetype;
 #[macro_use(uniform)]
@@ -9,8 +9,8 @@ extern crate glutin;
 extern crate graphics;
 extern crate image;
 
-pub use glyph_cache::GlyphCache;
-pub use backend::GliumSurfaceBackEnd;
+pub use glyph_cache::{GlyphCache, GlyphTexture};
+pub use backend::{GliumSurfaceBackEnd, DrawTexture};
 
 mod glyph_cache;
 mod backend;

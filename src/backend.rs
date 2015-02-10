@@ -1,7 +1,8 @@
 use std::sync::Arc;
 use std::default::Default;
 use graphics::{ImageSize, BackEnd};
-use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer};
+use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
+            DrawParameters, BlendingFunction, LinearBlendingFactor};
 use glium::index::{NoIndices, PrimitiveType};
 use shader;
 
@@ -9,6 +10,12 @@ use shader;
 #[derive(Clone)]
 pub struct DrawTexture {
     texture: Arc<Texture2d>,
+}
+
+impl DrawTexture {
+    pub fn new(texture: Texture2d) -> DrawTexture {
+        DrawTexture { texture: Arc::new(texture) }
+    }
 }
 
 impl ImageSize for DrawTexture {
@@ -102,7 +109,13 @@ impl<'a, S: Surface> BackEnd for GliumSurfaceBackEnd<'a, S> {
             &NoIndices(PrimitiveType::TrianglesList),
             &self.shader_color,
             &uniform! { color: self.draw_color.unwrap_or([1., 1., 1., 1.]) },
-            &Default::default(),
+            &DrawParameters {
+                blending_function: Some(BlendingFunction::Addition {
+                    source: LinearBlendingFactor::SourceAlpha,
+                    destination: LinearBlendingFactor::OneMinusSourceAlpha,
+                }),
+                .. Default::default()
+            },
         )
         .ok()
         .expect("failed to draw triangle list");
@@ -119,7 +132,8 @@ impl<'a, S: Surface> BackEnd for GliumSurfaceBackEnd<'a, S> {
             (0..min(vertices.len(), texture_coords.len()) / 2)
                 .map(|i| TexturedVertex {
                     position: [vertices[2 * i], vertices[2 * i + 1]],
-                    texcoord: [texture_coords[2 * i], texture_coords[2 * i + 1]],
+                    // FIXME: The `1.0 - ...` is because of a wrong convention
+                    texcoord: [texture_coords[2 * i], 1.0 - texture_coords[2 * i + 1]],
                 })
                 .collect()
         );
@@ -132,7 +146,13 @@ impl<'a, S: Surface> BackEnd for GliumSurfaceBackEnd<'a, S> {
                 color: self.draw_color.unwrap_or([1., 1., 1., 1.]),
                 s_texture: texture
             },
-            &Default::default(),
+            &DrawParameters {
+                blending_function: Some(BlendingFunction::Addition {
+                    source: LinearBlendingFactor::SourceAlpha,
+                    destination: LinearBlendingFactor::OneMinusSourceAlpha,
+                }),
+                .. Default::default()
+            },
         )
         .ok()
         .expect("failed to draw triangle list");
