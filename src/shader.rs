@@ -2,11 +2,11 @@ pub static VS_COLORED_120: &'static str = "
 #version 120
 uniform vec4 color;
 
-attribute vec4 pos;
+attribute vec2 position;
 
 void main()
 {
-    gl_Position = pos;
+    gl_Position = vec4(position, 0.0, 1.0);
 }
 ";
 
@@ -24,17 +24,17 @@ pub static VS_TEXTURED_120: &'static str = "
 #version 120
 uniform vec4 color;
 
-attribute vec4 pos;
-attribute vec2 uv;
+attribute vec2 position;
+attribute vec2 texcoord;
 
 uniform sampler2D s_texture;
 
-varying vec2 v_uv;
+varying vec2 v_texcoord;
 
 void main()
 {
-    v_uv = uv;
-    gl_Position = pos;
+    v_texcoord = texcoord;
+    gl_Position = vec4(position, 0.0, 1.0);
 }
 ";
 
@@ -43,10 +43,10 @@ pub static FS_TEXTURED_120: &'static str = "
 uniform vec4 color;
 uniform sampler2D s_texture;
 
-varying vec2 v_uv;
+varying vec2 v_texcoord;
 
 void main()
 {
-    gl_FragColor = texture2D(s_texture, v_uv) * color;
+    gl_FragColor = texture2D(s_texture, v_texcoord) * color;
 }
 ";
