@@ -42,8 +42,12 @@ struct TexturedVertex {
 
 
 pub struct GliumBackendSystem {
-    plain_buffer: VertexBuffer<PlainVertex>,
-    textured_buffer: VertexBuffer<TexturedVertex>,
+    next_plain_buffer: u32,
+    plain_buffer1: VertexBuffer<PlainVertex>,
+    plain_buffer2: VertexBuffer<PlainVertex>,
+    next_textured_buffer: u32,
+    textured_buffer1: VertexBuffer<TexturedVertex>,
+    textured_buffer2: VertexBuffer<TexturedVertex>,
     shader_texture: Program,
     shader_color: Program,
 }
@@ -52,13 +56,17 @@ impl GliumBackendSystem {
     pub fn new(display: &Display) -> GliumBackendSystem {
         // FIXME: create empty buffers when glium supports them
         let plain_data = ::std::iter::repeat(PlainVertex { position: [0.0, 0.0] })
-                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect();
+                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
         let textured_data = ::std::iter::repeat(TexturedVertex { position: [0.0, 0.0], texcoord: [0.0, 0.0] })
-                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect();
+                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
 
         GliumBackendSystem {
-            plain_buffer: VertexBuffer::new(display, plain_data),
-            textured_buffer: VertexBuffer::new(display, textured_data),
+            next_plain_buffer: 0,
+            plain_buffer1: VertexBuffer::new(display, plain_data.clone()),
+            plain_buffer2: VertexBuffer::new(display, plain_data),
+            next_textured_buffer: 0,
+            textured_buffer1: VertexBuffer::new(display, textured_data.clone()),
+            textured_buffer2: VertexBuffer::new(display, textured_data),
             shader_texture: Program::from_source(display,
                             shader::VS_TEXTURED_120, shader::FS_TEXTURED_120, None)
                             .ok().expect("failed to initialize textured shader"),
@@ -116,7 +124,17 @@ impl<'d, 's, S: Surface> BackEnd for GliumSurfaceBackEnd<'d, 's, S> {
 
     /// Renders list of 2d triangles.
     fn tri_list(&mut self, vertices: &[f32]) {
-        let slice = self.system.plain_buffer.slice(0, vertices.len() / 2).unwrap();
+        let slice = match self.system.next_plain_buffer {
+            0 => {
+                self.system.next_plain_buffer = 1;
+                self.system.plain_buffer1.slice(0, vertices.len() / 2).unwrap()
+            },
+            1 => {
+                self.system.next_plain_buffer = 0;
+                self.system.plain_buffer2.slice(0, vertices.len() / 2).unwrap()
+            },
+            _ => unreachable!()
+        };
 
         slice.write({
             (0..vertices.len() / 2)
@@ -151,7 +169,18 @@ impl<'d, 's, S: Surface> BackEnd for GliumSurfaceBackEnd<'d, 's, S> {
         use std::cmp::min;
 
         let len = min(vertices.len(), texture_coords.len()) / 2;
-        let slice = self.system.textured_buffer.slice(0, len).unwrap();
+
+        let slice = match self.system.next_textured_buffer {
+            0 => {
+                self.system.next_textured_buffer = 1;
+                self.system.textured_buffer1.slice(0, len).unwrap()
+            },
+            1 => {
+                self.system.next_textured_buffer = 0;
+                self.system.textured_buffer2.slice(0, len).unwrap()
+            },
+            _ => unreachable!()
+        };
 
         slice.write({
             (0..len)
