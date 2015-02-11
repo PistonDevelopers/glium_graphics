@@ -1,7 +1,10 @@
 [package]
 name = "glium_graphics"
-version = "0.0.1"
-authors = ["Eduard Bopp <eduard.bopp@aepsil0n.de>"]
+version = "0.0.2"
+authors = [
+    "Eduard Bopp <eduard.bopp@aepsil0n.de>",
+    "bvssvni <bvssvni@gmail.com>"
+]
 
 [dependencies.freetype-rs]
 git = "https://github.com/PistonDevelopers/freetype-rs"
