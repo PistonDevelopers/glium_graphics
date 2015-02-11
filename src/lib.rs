@@ -10,7 +10,7 @@ extern crate graphics;
 extern crate image;
 
 pub use glyph_cache::{GlyphCache, GlyphTexture};
-pub use backend::{GliumSurfaceBackEnd, DrawTexture};
+pub use backend::{GliumBackendSystem, GliumSurfaceBackEnd, DrawTexture};
 
 mod glyph_cache;
 mod backend;
