@@ -1,10 +1,9 @@
 #![feature(plugin)]
+#![plugin(glium_macros)]
 
 extern crate freetype;
 #[macro_use(uniform)]
 extern crate glium;
-#[plugin]
-extern crate glium_macros;
 extern crate glutin;
 extern crate graphics;
 extern crate image;

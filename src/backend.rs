@@ -81,8 +81,6 @@ impl GliumBackendSystem {
 pub struct GliumSurfaceBackEnd<'d, 's, S: 's> {
     system: &'d mut GliumBackendSystem,
     surface: &'s mut S,
-    draw_texture: Option<DrawTexture>,
-    draw_color: Option<[f32; 4]>,
 }
 
 impl<'d, 's, S> GliumSurfaceBackEnd<'d, 's, S> {
@@ -91,8 +89,6 @@ impl<'d, 's, S> GliumSurfaceBackEnd<'d, 's, S> {
         GliumSurfaceBackEnd {
             system: system,
             surface: surface,
-            draw_texture: None,
-            draw_color: None,
         }
     }
 }
@@ -107,109 +103,102 @@ impl<'d, 's, S: Surface> BackEnd for GliumSurfaceBackEnd<'d, 's, S> {
         self.surface.clear_color(r, g, b, a);
     }
 
-    /// Sets the texture.
-    fn enable_texture(&mut self, texture: &DrawTexture) {
-        self.draw_texture = Some(texture.clone());
-    }
-
-    /// Disables texture.
-    fn disable_texture(&mut self) {
-        self.draw_texture = None;
-    }
-
-    /// Sets the current color.
-    fn color(&mut self, color: [f32; 4]) {
-        self.draw_color = Some(color);
-    }
-
     /// Renders list of 2d triangles.
-    fn tri_list(&mut self, vertices: &[f32]) {
-        let slice = match self.system.next_plain_buffer {
-            0 => {
-                self.system.next_plain_buffer = 1;
-                self.system.plain_buffer1.slice(0, vertices.len() / 2).unwrap()
-            },
-            1 => {
-                self.system.next_plain_buffer = 0;
-                self.system.plain_buffer2.slice(0, vertices.len() / 2).unwrap()
-            },
-            _ => unreachable!()
-        };
+    fn tri_list<F>(&mut self, color: &[f32; 4], mut f: F)
+        where F: FnMut(&mut FnMut(&[f32]))
+    {
+        f(&mut |vertices: &[f32]| {
+            let slice = match self.system.next_plain_buffer {
+                0 => {
+                    self.system.next_plain_buffer = 1;
+                    self.system.plain_buffer1.slice(0, vertices.len() / 2).unwrap()
+                },
+                1 => {
+                    self.system.next_plain_buffer = 0;
+                    self.system.plain_buffer2.slice(0, vertices.len() / 2).unwrap()
+                },
+                _ => unreachable!()
+            };
 
-        slice.write({
-            (0..vertices.len() / 2)
-                .map(|i| PlainVertex {
-                    position: [vertices[2 * i], vertices[2 * i + 1]],
-                })
-                .collect()
-        });
+            slice.write({
+                (0..vertices.len() / 2)
+                    .map(|i| PlainVertex {
+                        position: [vertices[2 * i], vertices[2 * i + 1]],
+                    })
+                    .collect()
+            });
 
-        self.surface.draw(
-            slice,
-            &NoIndices(PrimitiveType::TrianglesList),
-            &self.system.shader_color,
-            &uniform! { color: self.draw_color.unwrap_or([1., 1., 1., 1.]) },
-            &DrawParameters {
-                blending_function: Some(BlendingFunction::Addition {
-                    source: LinearBlendingFactor::SourceAlpha,
-                    destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                }),
-                .. Default::default()
-            },
-        )
-        .ok()
-        .expect("failed to draw triangle list");
+            self.surface.draw(
+                slice,
+                &NoIndices(PrimitiveType::TrianglesList),
+                &self.system.shader_color,
+                &uniform! { color: *color },
+                &DrawParameters {
+                    blending_function: Some(BlendingFunction::Addition {
+                        source: LinearBlendingFactor::SourceAlpha,
+                        destination: LinearBlendingFactor::OneMinusSourceAlpha,
+                    }),
+                    .. Default::default()
+                },
+            )
+            .ok()
+            .expect("failed to draw triangle list");
+        })
     }
 
     /// Renders list of 2d triangles.
     ///
     /// A texture coordinate is assigned per vertex.
     /// The texture coordinates refers to the current texture.
-    fn tri_list_uv(&mut self, vertices: &[f32], texture_coords: &[f32]) {
+    fn tri_list_uv<F>(&mut self, color: &[f32; 4], texture: &DrawTexture, mut f: F)
+        where F: FnMut(&mut FnMut(&[f32], &[f32]))
+    {
         use std::cmp::min;
 
-        let len = min(vertices.len(), texture_coords.len()) / 2;
+        f(&mut |vertices: &[f32], texture_coords: &[f32]| {
+            let len = min(vertices.len(), texture_coords.len()) / 2;
 
-        let slice = match self.system.next_textured_buffer {
-            0 => {
-                self.system.next_textured_buffer = 1;
-                self.system.textured_buffer1.slice(0, len).unwrap()
-            },
-            1 => {
-                self.system.next_textured_buffer = 0;
-                self.system.textured_buffer2.slice(0, len).unwrap()
-            },
-            _ => unreachable!()
-        };
+            let slice = match self.system.next_textured_buffer {
+                0 => {
+                    self.system.next_textured_buffer = 1;
+                    self.system.textured_buffer1.slice(0, len).unwrap()
+                },
+                1 => {
+                    self.system.next_textured_buffer = 0;
+                    self.system.textured_buffer2.slice(0, len).unwrap()
+                },
+                _ => unreachable!()
+            };
 
-        slice.write({
-            (0..len)
-                .map(|i| TexturedVertex {
-                    position: [vertices[2 * i], vertices[2 * i + 1]],
-                    // FIXME: The `1.0 - ...` is because of a wrong convention
-                    texcoord: [texture_coords[2 * i], 1.0 - texture_coords[2 * i + 1]],
-                })
-                .collect()
-        });
+            slice.write({
+                (0..len)
+                    .map(|i| TexturedVertex {
+                        position: [vertices[2 * i], vertices[2 * i + 1]],
+                        // FIXME: The `1.0 - ...` is because of a wrong convention
+                        texcoord: [texture_coords[2 * i], 1.0 - texture_coords[2 * i + 1]],
+                    })
+                    .collect()
+            });
 
-        let texture = &*(self.draw_texture.as_ref().unwrap().texture);
-        self.surface.draw(
-            slice,
-            &NoIndices(PrimitiveType::TrianglesList),
-            &self.system.shader_texture,
-            &uniform! {
-                color: self.draw_color.unwrap_or([1., 1., 1., 1.]),
-                s_texture: texture
-            },
-            &DrawParameters {
-                blending_function: Some(BlendingFunction::Addition {
-                    source: LinearBlendingFactor::SourceAlpha,
-                    destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                }),
-                .. Default::default()
-            },
-        )
-        .ok()
-        .expect("failed to draw triangle list");
+            let texture = &*(texture.texture);
+            self.surface.draw(
+                slice,
+                &NoIndices(PrimitiveType::TrianglesList),
+                &self.system.shader_texture,
+                &uniform! {
+                    color: *color,
+                    s_texture: texture
+                },
+                &DrawParameters {
+                    blending_function: Some(BlendingFunction::Addition {
+                        source: LinearBlendingFactor::SourceAlpha,
+                        destination: LinearBlendingFactor::OneMinusSourceAlpha,
+                    }),
+                    .. Default::default()
+                },
+            )
+            .ok()
+            .expect("failed to draw triangle list");
+        })
     }
 }
