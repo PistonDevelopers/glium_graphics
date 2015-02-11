@@ -12,7 +12,7 @@ fn main() {
     use std::old_io::BufReader;
     use std::time::duration::Duration;
     use glium::{DisplayBuild, Surface, Texture2d};
-    use glium_graphics::{GliumSurfaceBackEnd, DrawTexture};
+    use glium_graphics::{GliumBackendSystem, GliumSurfaceBackEnd, DrawTexture};
     use graphics::{Context, RelativeTransform};
 
     let display = glutin::WindowBuilder::new()
@@ -29,10 +29,12 @@ fn main() {
         Texture2d::new(&display, image)
     });
 
+    let mut system = GliumBackendSystem::new(&display);
+
     loop {
         let mut target = display.draw();
         {
-            let mut backend = GliumSurfaceBackEnd::new(display.clone(), &mut target);
+            let mut backend = GliumSurfaceBackEnd::new(&mut system, &mut target);
             let context = Context::abs(300.0, 300.0);
             graphics::clear([1.0; 4], &mut backend);
             graphics::Rectangle::new([1.0, 0.0, 0.0, 1.0])
