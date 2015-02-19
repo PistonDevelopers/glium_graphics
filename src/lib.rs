@@ -1,3 +1,5 @@
+#![feature(std_misc)]
+
 extern crate freetype;
 #[macro_use(uniform)]
 extern crate glium;
