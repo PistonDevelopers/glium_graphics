@@ -2,8 +2,9 @@ use std::sync::Arc;
 use std::default::Default;
 use graphics::{self, ImageSize, BackEnd};
 use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
-            DrawParameters, BlendingFunction, LinearBlendingFactor};
+            DrawParameters, BlendingFunction, LinearBlendingFactor, Vertex};
 use glium::index::{NoIndices, PrimitiveType};
+use glium::vertex::{VertexFormat, AttributeType};
 use shader;
 
 
@@ -26,18 +27,33 @@ impl ImageSize for DrawTexture {
 }
 
 
-#[vertex_format]
 #[derive(Copy, Clone)]
 struct PlainVertex {
     position: [f32; 2],
 }
 
+impl Vertex for PlainVertex {
+    fn build_bindings() -> VertexFormat {
+        vec![
+            ("position".to_string(), 0, AttributeType::F32F32),
+        ]
+    }
+}
 
-#[vertex_format]
+
 #[derive(Copy, Clone)]
 struct TexturedVertex {
     position: [f32; 2],
     texcoord: [f32; 2],
+}
+
+impl Vertex for TexturedVertex {
+    fn build_bindings() -> VertexFormat {
+        vec![
+            ("position".to_string(), 0, AttributeType::F32F32),
+            ("texcoord".to_string(), 8, AttributeType::F32F32),
+        ]
+    }
 }
 
 
