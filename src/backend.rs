@@ -2,9 +2,8 @@ use std::sync::Arc;
 use std::default::Default;
 use graphics::{self, ImageSize, BackEnd};
 use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
-            DrawParameters, BlendingFunction, LinearBlendingFactor, Vertex};
+            DrawParameters, BlendingFunction, LinearBlendingFactor};
 use glium::index::{NoIndices, PrimitiveType};
-use glium::vertex::{VertexFormat, AttributeType};
 use shader;
 
 
