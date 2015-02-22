@@ -2,9 +2,8 @@ use std::sync::Arc;
 use std::default::Default;
 use graphics::{self, ImageSize, BackEnd};
 use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
-            DrawParameters, BlendingFunction, LinearBlendingFactor, Vertex};
+            DrawParameters, BlendingFunction, LinearBlendingFactor};
 use glium::index::{NoIndices, PrimitiveType};
-use glium::vertex::{VertexFormat, AttributeType};
 use shader;
 
 
@@ -32,13 +31,7 @@ struct PlainVertex {
     position: [f32; 2],
 }
 
-impl Vertex for PlainVertex {
-    fn build_bindings() -> VertexFormat {
-        vec![
-            ("position".to_string(), 0, AttributeType::F32F32),
-        ]
-    }
-}
+implement_vertex!(PlainVertex, position);
 
 
 #[derive(Copy, Clone)]
@@ -47,14 +40,7 @@ struct TexturedVertex {
     texcoord: [f32; 2],
 }
 
-impl Vertex for TexturedVertex {
-    fn build_bindings() -> VertexFormat {
-        vec![
-            ("position".to_string(), 0, AttributeType::F32F32),
-            ("texcoord".to_string(), 8, AttributeType::F32F32),
-        ]
-    }
-}
+implement_vertex!(TexturedVertex, position, texcoord);
 
 
 pub struct GliumBackendSystem {
