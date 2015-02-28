@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use std::default::Default;
-use graphics::{self, ImageSize, BackEnd};
+use graphics::{self, ImageSize, Graphics};
 use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
             DrawParameters, BlendingFunction, LinearBlendingFactor};
 use glium::index::{NoIndices, PrimitiveType};
@@ -96,7 +96,7 @@ impl<'d, 's, S> GliumSurfaceBackEnd<'d, 's, S> {
 }
 
 /// Implemented by all graphics back-ends.
-impl<'d, 's, S: Surface> BackEnd for GliumSurfaceBackEnd<'d, 's, S> {
+impl<'d, 's, S: Surface> Graphics for GliumSurfaceBackEnd<'d, 's, S> {
     type Texture = DrawTexture;
 
     /// Clears background with a color.
