@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use std::default::Default;
-use graphics::{self, ImageSize, Graphics};
+use graphics::{self, DrawState, ImageSize, Graphics};
 use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
             DrawParameters, BlendingFunction, LinearBlendingFactor};
 use glium::index::{NoIndices, PrimitiveType};
@@ -106,7 +106,12 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     }
 
     /// Renders list of 2d triangles.
-    fn tri_list<F>(&mut self, color: &[f32; 4], mut f: F)
+    fn tri_list<F>(
+        &mut self,
+        _draw_state: &DrawState,
+        color: &[f32; 4],
+        mut f: F
+    )
         where F: FnMut(&mut FnMut(&[f32]))
     {
         f(&mut |vertices: &[f32]| {
@@ -152,7 +157,13 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     ///
     /// A texture coordinate is assigned per vertex.
     /// The texture coordinates refers to the current texture.
-    fn tri_list_uv<F>(&mut self, color: &[f32; 4], texture: &DrawTexture, mut f: F)
+    fn tri_list_uv<F>(
+        &mut self,
+        _draw_state: &DrawState,
+        color: &[f32; 4],
+        texture: &DrawTexture,
+        mut f: F
+    )
         where F: FnMut(&mut FnMut(&[f32], &[f32]))
     {
         use std::cmp::min;
