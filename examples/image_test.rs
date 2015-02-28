@@ -1,4 +1,4 @@
-#![feature(std_misc, io)]
+#![feature(std_misc, old_io)]
 
 extern crate graphics;
 extern crate glium;
@@ -48,6 +48,13 @@ fn main() {
             graphics::image(&rust_logo, &context.trans(100.0, 100.0), &mut g);
         }
         target.finish();
+
+        for event in display.poll_events() {
+            match event {
+                glutin::Event::Closed => return,
+                _ => ()
+            }
+        }
         sleep(Duration::milliseconds(15));
     }
 }
