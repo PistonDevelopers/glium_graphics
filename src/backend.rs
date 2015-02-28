@@ -43,7 +43,7 @@ struct TexturedVertex {
 implement_vertex!(TexturedVertex, position, texcoord);
 
 
-pub struct GliumBackendSystem {
+pub struct Glium2d {
     next_plain_buffer: u32,
     plain_buffer1: VertexBuffer<PlainVertex>,
     plain_buffer2: VertexBuffer<PlainVertex>,
@@ -54,15 +54,15 @@ pub struct GliumBackendSystem {
     shader_color: Program,
 }
 
-impl GliumBackendSystem {
-    pub fn new(display: &Display) -> GliumBackendSystem {
+impl Glium2d {
+    pub fn new(display: &Display) -> Glium2d {
         // FIXME: create empty buffers when glium supports them
         let plain_data = ::std::iter::repeat(PlainVertex { position: [0.0, 0.0] })
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
         let textured_data = ::std::iter::repeat(TexturedVertex { position: [0.0, 0.0], texcoord: [0.0, 0.0] })
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
 
-        GliumBackendSystem {
+        Glium2d {
             next_plain_buffer: 0,
             plain_buffer1: VertexBuffer::new(display, plain_data.clone()),
             plain_buffer2: VertexBuffer::new(display, plain_data),
@@ -80,15 +80,15 @@ impl GliumBackendSystem {
 }
 
 
-pub struct GliumSurfaceBackEnd<'d, 's, S: 's> {
-    system: &'d mut GliumBackendSystem,
+pub struct GliumGraphics<'d, 's, S: 's> {
+    system: &'d mut Glium2d,
     surface: &'s mut S,
 }
 
-impl<'d, 's, S> GliumSurfaceBackEnd<'d, 's, S> {
-    pub fn new(system: &'d mut GliumBackendSystem, surface: &'s mut S)
-               -> GliumSurfaceBackEnd<'d, 's, S> {
-        GliumSurfaceBackEnd {
+impl<'d, 's, S> GliumGraphics<'d, 's, S> {
+    pub fn new(system: &'d mut Glium2d, surface: &'s mut S)
+               -> GliumGraphics<'d, 's, S> {
+        GliumGraphics {
             system: system,
             surface: surface,
         }
@@ -96,7 +96,7 @@ impl<'d, 's, S> GliumSurfaceBackEnd<'d, 's, S> {
 }
 
 /// Implemented by all graphics back-ends.
-impl<'d, 's, S: Surface> Graphics for GliumSurfaceBackEnd<'d, 's, S> {
+impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     type Texture = DrawTexture;
 
     /// Clears background with a color.
