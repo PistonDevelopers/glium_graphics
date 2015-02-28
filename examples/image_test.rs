@@ -12,7 +12,7 @@ fn main() {
     use std::old_io::BufReader;
     use std::time::duration::Duration;
     use glium::{DisplayBuild, Surface, Texture2d};
-    use glium_graphics::{GliumBackendSystem, GliumSurfaceBackEnd, DrawTexture};
+    use glium_graphics::{Glium2d, GliumGraphics, DrawTexture};
     use graphics::{Context, RelativeTransform};
 
     let display = glutin::WindowBuilder::new()
@@ -29,23 +29,23 @@ fn main() {
         Texture2d::new(&display, image)
     });
 
-    let mut system = GliumBackendSystem::new(&display);
+    let mut g2d = Glium2d::new(&display);
 
     loop {
         let mut target = display.draw();
         {
-            let mut backend = GliumSurfaceBackEnd::new(&mut system, &mut target);
+            let mut g = GliumGraphics::new(&mut g2d, &mut target);
             let context = Context::abs(300.0, 300.0);
-            graphics::clear([1.0; 4], &mut backend);
+            graphics::clear([1.0; 4], &mut g);
             graphics::Rectangle::new([1.0, 0.0, 0.0, 1.0])
-                .draw([0.0, 0.0, 100.0, 100.0], &context, &mut backend);
+                .draw([0.0, 0.0, 100.0, 100.0], &context, &mut g);
             graphics::Rectangle::new([0.0, 1.0, 0.0, 0.3])
                 .draw(
                     [50.0, 50.0, 100.0, 100.0],
                     &context,
-                    &mut backend
+                    &mut g
                 );
-            graphics::image(&rust_logo, &context.trans(100.0, 100.0), &mut backend);
+            graphics::image(&rust_logo, &context.trans(100.0, 100.0), &mut g);
         }
         target.finish();
         sleep(Duration::milliseconds(15));
