@@ -12,6 +12,9 @@ git = "https://github.com/PistonDevelopers/freetype-rs"
 [dependencies.piston2d-graphics]
 git = "https://github.com/PistonDevelopers/graphics"
 
+[dependencies.shader_version]
+git = "https://github.com/PistonDevelopers/shader_version"
+
 [dependencies.glium]
 git = "https://github.com/tomaka/glium"
 features = ["image", "gl_read_buffer"]
