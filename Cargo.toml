@@ -21,4 +21,4 @@ default_features = false
 git = "https://github.com/tomaka/glutin"
 
 [dependencies.image]
-git = "https://github.com/PistonDevelopers/image"
+#git = "https://github.com/PistonDevelopers/image"
