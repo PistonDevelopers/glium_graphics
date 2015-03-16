@@ -3,7 +3,6 @@
 extern crate freetype;
 #[macro_use(uniform, implement_vertex)]
 extern crate glium;
-extern crate glutin;
 extern crate graphics;
 extern crate image;
 
