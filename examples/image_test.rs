@@ -9,7 +9,7 @@ extern crate image;
 use std::old_io::timer::sleep;
 use std::time::duration::Duration;
 use glium::{ DisplayBuild, Surface, Texture2d };
-use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture };
+use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, OpenGL };
 use graphics::{ RelativeTransform, default_draw_state };
 
 fn main() {
@@ -23,7 +23,7 @@ fn main() {
         Texture2d::new(&window, image)
     });
 
-    let mut g2d = Glium2d::new(&window);
+    let mut g2d = Glium2d::new(OpenGL::_3_2, &window);
 
     let draw_state = default_draw_state();
 
