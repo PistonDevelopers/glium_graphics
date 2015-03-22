@@ -1,33 +1,14 @@
-use std::sync::Arc;
 use std::default::Default;
-use graphics::{self, DrawState, ImageSize, Graphics};
-use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
-            DrawParameters, BlendingFunction, LinearBlendingFactor};
-use glium::index::{NoIndices, PrimitiveType};
-use shader_version::Shaders;
+use graphics::{ DrawState, Graphics, BACK_END_MAX_VERTEX_COUNT };
+use glium_lib::{
+    Display, Surface, Program, VertexBuffer,
+    DrawParameters, BlendingFunction, LinearBlendingFactor
+};
+use glium_lib::index::{ NoIndices, PrimitiveType };
+use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
 
-use shader;
-use OpenGL;
-
-
-#[derive(Clone)]
-pub struct DrawTexture {
-    texture: Arc<Texture2d>,
-}
-
-impl DrawTexture {
-    pub fn new(texture: Texture2d) -> DrawTexture {
-        DrawTexture { texture: Arc::new(texture) }
-    }
-}
-
-impl ImageSize for DrawTexture {
-    fn get_size(&self) -> (u32, u32) {
-        let ref tex = self.texture;
-        (tex.get_width(), tex.get_height().unwrap())
-    }
-}
+use { shader, GliumTexture };
 
 
 #[derive(Copy, Clone)]
@@ -61,10 +42,9 @@ pub struct Glium2d {
 impl Glium2d {
     pub fn new(opengl: OpenGL, display: &Display) -> Glium2d {
         // FIXME: create empty buffers when glium supports them
-        let plain_data = ::std::iter::repeat(PlainVertex { position: [0.0, 0.0] })
-                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
-        let textured_data = ::std::iter::repeat(TexturedVertex { position: [0.0, 0.0], texcoord: [0.0, 0.0] })
-                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
+        let plain_data = vec![PlainVertex { position: [0.0, 0.0] }; BACK_END_MAX_VERTEX_COUNT];
+        let textured_data = vec![TexturedVertex { position: [0.0, 0.0], texcoord: [0.0, 0.0] };
+                                 BACK_END_MAX_VERTEX_COUNT];
 
         Glium2d {
             next_plain_buffer: 0,
@@ -113,7 +93,7 @@ impl<'d, 's, S> GliumGraphics<'d, 's, S> {
 
 /// Implemented by all graphics back-ends.
 impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
-    type Texture = DrawTexture;
+    type Texture = GliumTexture;
 
     /// Clears background with a color.
     fn clear(&mut self, color: [f32; 4]) {
@@ -177,7 +157,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         &mut self,
         _draw_state: &DrawState,
         color: &[f32; 4],
-        texture: &DrawTexture,
+        texture: &GliumTexture,
         mut f: F
     )
         where F: FnMut(&mut FnMut(&[f32], &[f32]))
@@ -209,14 +189,13 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect()
             });
 
-            let texture = &*(texture.texture);
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
                 &self.system.shader_texture,
                 &uniform! {
                     color: *color,
-                    s_texture: texture
+                    s_texture: texture.get_texture2d()
                 },
                 &DrawParameters {
                     blending_function: Some(BlendingFunction::Addition {

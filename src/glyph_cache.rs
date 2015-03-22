@@ -1,10 +1,9 @@
 use std::collections::HashMap;
-use graphics::character::{CharacterCache, Character};
+use graphics::character::{ CharacterCache, Character };
 use graphics::internal::FontSize;
 use graphics::ImageSize;
-use glium::{Texture2d, Texture, Display};
-use image::{Luma, ImageBuffer};
-use freetype::{self, Face};
+use glium_lib::{ Texture2d, Texture, Display };
+use freetype::{ self, Face };
 
 
 pub struct GlyphTexture(pub Texture2d);
@@ -25,12 +24,10 @@ fn load_character(face: &Face, display: &Display, font_size: FontSize, character
     let glyph = face.glyph().get_glyph().unwrap();
     let bitmap_glyph = glyph.to_bitmap(freetype::render_mode::RenderMode::Normal, None).unwrap();
     let bitmap = bitmap_glyph.bitmap();
-    let texture = Texture2d::new(
+    let texture = Texture2d::new::<Vec<Vec<(u8, u8, u8, u8)>>>(
         display,
-        ImageBuffer::<Luma<u8>, _>::from_raw(
-            bitmap.width() as u32, bitmap.rows() as u32,
-            bitmap.buffer().iter().map(|&pix| pix).collect::<Vec<_>>()
-        ).expect("failed to create glyph texture")
+        bitmap.buffer().chunks(bitmap.width() as usize)
+              .map(|row| row.iter().map(|&p| (255, 255, 255, p)).collect()).rev().collect()
     );
     let glyph_size = glyph.advance();
     Character {
@@ -58,7 +55,7 @@ impl CharacterCache for GlyphCache {
     type Texture = GlyphTexture;
 
     fn character<'a>(&'a mut self, font_size: FontSize, character: char)
-        -> &'a Character<GlyphTexture> 
+        -> &'a Character<GlyphTexture>
     {
         use std::collections::hash_map::Entry::{Vacant, Occupied};
         let size_cache: &'a mut HashMap<char, _> = match self.data.entry(font_size) {
