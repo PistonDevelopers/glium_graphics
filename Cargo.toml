@@ -17,11 +17,23 @@ git = "https://github.com/PistonDevelopers/shader_version"
 
 [dependencies.glium]
 git = "https://github.com/tomaka/glium"
-features = ["image", "gl_read_buffer"]
 default_features = false
 
-[dev-dependencies.glutin]
-#git = "https://github.com/tomaka/glutin"
+[dependencies.piston-texture]
+git = "https://github.com/PistonDevelopers/texture"
 
-[dependencies.image]
-#git = "https://github.com/PistonDevelopers/image"
+[dev-dependencies.glutin]
+
+[dev-dependencies.image]
+default-features = false
+features = ["png"]
+
+[features]
+default = ["image_png"]
+image_gif = ["piston-texture/image_gif"]
+image_jpeg = ["piston-texture/image_jpeg"]
+image_png = ["piston-texture/image_png"]
+image_ppm = ["piston-texture/image_ppm"]
+image_tga = ["piston-texture/image_tga"]
+image_tiff = ["piston-texture/image_tiff"]
+image_webp = ["piston-texture/image_webp"]

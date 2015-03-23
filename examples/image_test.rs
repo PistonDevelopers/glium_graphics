@@ -1,27 +1,24 @@
-#![feature(std_misc, old_io, old_path)]
+#![feature(std_misc, old_io)]
 
 extern crate graphics;
-extern crate glium;
 extern crate glutin;
 extern crate glium_graphics;
 extern crate image;
 
+use std::path::Path;
 use std::old_io::timer::sleep;
 use std::time::duration::Duration;
-use glium::{ DisplayBuild, Surface, Texture2d };
-use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, OpenGL };
+use glium_graphics::glium::{ DisplayBuild, Surface };
+use glium_graphics::{ Glium2d, GliumGraphics, OpenGL, TextureWithDevice };
 use graphics::{ RelativeTransform, default_draw_state };
 
 fn main() {
-    let window = glutin::WindowBuilder::new()
+    let mut window = glutin::WindowBuilder::new()
         .with_dimensions(300, 300)
-        .with_title(format!("Image test"))
+        .with_title("glium_graphics: image_test".to_string())
         .build_glium().unwrap();
 
-    let rust_logo = DrawTexture::new({
-        let image = image::open(&Path::new("assets/rust.png")).unwrap();
-        Texture2d::new(&window, image)
-    });
+    let rust_logo = TextureWithDevice::from_path(&mut window, &Path::new("assets/rust.png")).unwrap();
 
     let mut g2d = Glium2d::new(OpenGL::_3_2, &window);
 
