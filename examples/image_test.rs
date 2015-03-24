@@ -1,4 +1,4 @@
-#![feature(std_misc, old_io, old_path)]
+#![feature(std_misc, thread_sleep, old_path)]
 
 extern crate graphics;
 extern crate glium;
@@ -6,7 +6,9 @@ extern crate glutin;
 extern crate glium_graphics;
 extern crate image;
 
-use std::old_io::timer::sleep;
+use std::old_path::*;
+
+use std::thread::sleep;
 use std::time::duration::Duration;
 use glium::{ DisplayBuild, Surface, Texture2d };
 use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, OpenGL };
@@ -15,7 +17,7 @@ use graphics::{ RelativeTransform, default_draw_state };
 fn main() {
     let window = glutin::WindowBuilder::new()
         .with_dimensions(300, 300)
-        .with_title(format!("Image test"))
+        .with_title("glium_graphics: image_test".to_string())
         .build_glium().unwrap();
 
     let rust_logo = DrawTexture::new({
@@ -49,7 +51,7 @@ fn main() {
         }
         target.finish();
 
-        for _ in window.poll_events() {}
+        window.poll_events().last();
         if window.is_closed() {
             break
         }
