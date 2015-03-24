@@ -83,7 +83,7 @@ impl Glium2d {
                                                    .get(opengl.to_GLSL()).unwrap(),
                                      None).ok().expect("failed to initialize textured shader"),
             shader_color:
-                Program::from_source(&display,
+                Program::from_source(display,
                                      Shaders::new().set(GLSL::_1_20, shader::VS_COLORED_120)
                                                    .set(GLSL::_1_50, shader::VS_COLORED_150)
                                                    .get(opengl.to_GLSL()).unwrap(),
