@@ -1,4 +1,4 @@
-#![feature(std_misc, thread_sleep, old_path)]
+#![feature(std_misc, thread_sleep)]
 
 extern crate graphics;
 extern crate glium;
@@ -6,13 +6,11 @@ extern crate glutin;
 extern crate glium_graphics;
 extern crate image;
 
-use std::old_path::*;
-
+use std::path::Path;
 use std::thread::sleep;
 use std::time::duration::Duration;
 use glium::{ DisplayBuild, Surface, Texture2d };
 use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, OpenGL };
-use graphics::{ RelativeTransform, default_draw_state };
 
 fn main() {
     let window = glutin::WindowBuilder::new()
@@ -26,28 +24,26 @@ fn main() {
     });
 
     let mut g2d = Glium2d::new(OpenGL::_3_2, &window);
-
-    let draw_state = default_draw_state();
+    let (w, h) = window.get_framebuffer_dimensions();
+    let transform = graphics::abs_transform(w as f64, h as f64);
 
     loop {
         let mut target = window.draw();
         {
-            let mut g = GliumGraphics::new(&mut g2d, &mut target);
-            let (w, h) = window.get_framebuffer_dimensions();
-            let transform = graphics::abs_transform(w as f64, h as f64);
+            use graphics::*;
 
-            graphics::clear([1.0; 4], &mut g);
-            graphics::Rectangle::new([1.0, 0.0, 0.0, 1.0])
-                .draw([0.0, 0.0, 100.0, 100.0],
-                      &draw_state,
+            let mut g = GliumGraphics::new(&mut g2d, &mut target);
+
+            clear(color::WHITE, &mut g);
+            rectangle([1.0, 0.0, 0.0, 1.0],
+                      [0.0, 0.0, 100.0, 100.0],
                       transform,
                       &mut g);
-            graphics::Rectangle::new([0.0, 1.0, 0.0, 0.3])
-                .draw([50.0, 50.0, 100.0, 100.0],
-                      &draw_state,
+            rectangle([0.0, 1.0, 0.0, 0.3],
+                      [50.0, 50.0, 100.0, 100.0],
                       transform,
                       &mut g);
-            graphics::image(&rust_logo, transform.trans(100.0, 100.0), &mut g);
+            image(&rust_logo, transform.trans(100.0, 100.0), &mut g);
         }
         target.finish();
 
