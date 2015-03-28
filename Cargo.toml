@@ -29,6 +29,9 @@ git = "https://github.com/PistonDevelopers/graphics"
 git = "https://github.com/PistonDevelopers/shader_version"
 #version = "0.0.6"
 
+[dependencies.pistoncore-window]
+git = "https://github.com/PistonDevelopers/window"
+
 [dependencies.glium]
 version = "0.2"
 features = ["image"]
