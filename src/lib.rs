@@ -1,3 +1,5 @@
+#![feature(slice_patterns)]
+
 extern crate freetype;
 #[macro_use(uniform, implement_vertex)]
 extern crate glium;
