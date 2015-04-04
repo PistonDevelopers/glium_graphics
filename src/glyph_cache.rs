@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use graphics::character::{CharacterCache, Character};
-use graphics::internal::FontSize;
+use graphics::types::FontSize;
 use graphics::ImageSize;
 use glium::{Texture2d, Texture, Display};
 use image::{Luma, ImageBuffer};
