@@ -47,14 +47,14 @@ fn load_character(face: &Face, display: &Display, font_size: FontSize, character
 }
 
 
-pub struct GlyphCache {
-    face: Face,
+pub struct GlyphCache<'a> {
+    face: Face<'a>,
     data: HashMap<FontSize, HashMap<char, Character<GlyphTexture>>>,
     display: Display,
 }
 
 
-impl CharacterCache for GlyphCache {
+impl<'b> CharacterCache for GlyphCache<'b> {
     type Texture = GlyphTexture;
 
     fn character<'a>(&'a mut self, font_size: FontSize, character: char)
