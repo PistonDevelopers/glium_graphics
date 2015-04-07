@@ -1,5 +1,3 @@
-#![feature(std_misc, thread_sleep)]
-
 extern crate graphics;
 extern crate glium;
 extern crate glutin;
@@ -7,8 +5,7 @@ extern crate glium_graphics;
 extern crate image;
 
 use std::path::Path;
-use std::thread::sleep;
-use std::time::duration::Duration;
+use std::thread::sleep_ms;
 use glium::{ DisplayBuild, Surface, Texture2d };
 use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, OpenGL };
 
@@ -51,6 +48,6 @@ fn main() {
         if window.is_closed() {
             break
         }
-        sleep(Duration::milliseconds(15));
+        sleep_ms(15);
     }
 }
