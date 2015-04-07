@@ -6,6 +6,12 @@ authors = [
     "bvssvni <bvssvni@gmail.com>"
 ]
 
+[dependencies]
+image = "*"
+
+[dev-dependencies]
+glutin = "*"
+
 [dependencies.freetype-rs]
 git = "https://github.com/PistonDevelopers/freetype-rs"
 
@@ -16,12 +22,5 @@ git = "https://github.com/PistonDevelopers/graphics"
 git = "https://github.com/PistonDevelopers/shader_version"
 
 [dependencies.glium]
-git = "https://github.com/tomaka/glium"
 features = ["image", "gl_read_buffer"]
 default_features = false
-
-[dev-dependencies.glutin]
-#git = "https://github.com/tomaka/glutin"
-
-[dependencies.image]
-#git = "https://github.com/PistonDevelopers/image"
