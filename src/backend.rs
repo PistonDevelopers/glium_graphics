@@ -120,6 +120,11 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         let [r, g, b, a] = color;
         self.surface.clear_color(r, g, b, a);
     }
+    
+    fn clear_stencil(&mut self, value: u8) {
+        self.surface.clear_stencil(value as i32);
+    }
+
 
     /// Renders list of 2d triangles.
     fn tri_list<F>(
