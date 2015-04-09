@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use std::default::Default;
 use graphics::{self, DrawState, ImageSize, Graphics};
 use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
@@ -11,21 +10,19 @@ use shader;
 use OpenGL;
 
 
-#[derive(Clone)]
 pub struct DrawTexture {
-    texture: Arc<Texture2d>,
+    texture: Texture2d
 }
 
 impl DrawTexture {
     pub fn new(texture: Texture2d) -> DrawTexture {
-        DrawTexture { texture: Arc::new(texture) }
+        DrawTexture { texture: texture }
     }
 }
 
 impl ImageSize for DrawTexture {
     fn get_size(&self) -> (u32, u32) {
-        let ref tex = self.texture;
-        (tex.get_width(), tex.get_height().unwrap())
+        (self.texture.get_width(), self.texture.get_height().unwrap())
     }
 }
 
@@ -182,7 +179,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         &mut self,
         _draw_state: &DrawState,
         color: &[f32; 4],
-        texture: &DrawTexture,
+        &DrawTexture { ref texture }: &DrawTexture,
         mut f: F
     )
         where F: FnMut(&mut FnMut(&[f32], &[f32]))
@@ -214,7 +211,6 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect()
             });
 
-            let texture = &*(texture.texture);
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
