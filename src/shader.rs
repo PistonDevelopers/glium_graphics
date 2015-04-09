@@ -1,4 +1,4 @@
-pub static VS_COLORED_120: &'static str = "
+pub const VS_COLORED_120: &'static str = "
 #version 120
 uniform vec4 color;
 
@@ -10,7 +10,7 @@ void main()
 }
 ";
 
-pub static VS_COLORED_150: &'static str = "
+pub const VS_COLORED_150: &'static str = "
 #version 150 core
 uniform vec4 color;
 
@@ -23,7 +23,7 @@ void main()
 ";
 
 
-pub static FS_COLORED_120: &'static str = "
+pub const FS_COLORED_120: &'static str = "
 #version 120
 uniform vec4 color;
 
@@ -33,7 +33,7 @@ void main()
 }
 ";
 
-pub static FS_COLORED_150: &'static str = "
+pub const FS_COLORED_150: &'static str = "
 #version 150 core
 uniform vec4 color;
 
@@ -46,7 +46,7 @@ void main()
 ";
 
 
-pub static VS_TEXTURED_120: &'static str = "
+pub const VS_TEXTURED_120: &'static str = "
 #version 120
 uniform vec4 color;
 
@@ -64,7 +64,7 @@ void main()
 }
 ";
 
-pub static VS_TEXTURED_150: &'static str = "
+pub const VS_TEXTURED_150: &'static str = "
 #version 150 core
 uniform sampler2D s_texture;
 uniform vec4 color;
@@ -82,7 +82,7 @@ void main()
 ";
 
 
-pub static FS_TEXTURED_120: &'static str = "
+pub const FS_TEXTURED_120: &'static str = "
 #version 120
 uniform vec4 color;
 uniform sampler2D s_texture;
@@ -95,7 +95,7 @@ void main()
 }
 ";
 
-pub static FS_TEXTURED_150: &'static str = "
+pub const FS_TEXTURED_150: &'static str = "
 #version 150 core
 uniform sampler2D s_texture;
 uniform vec4 color;

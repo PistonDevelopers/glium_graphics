@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-use graphics::character::{CharacterCache, Character};
+use graphics::character::{ CharacterCache, Character };
 use graphics::types::FontSize;
 use graphics::ImageSize;
-use glium::{Texture2d, Texture, Display};
-use image::{Luma, ImageBuffer};
-use freetype::{self, Face};
+use glium::{ Texture2d, Texture, Display };
+use image::{ Luma, ImageBuffer };
+use freetype::{ self, Face };
 
 
 pub struct GlyphTexture(pub Texture2d);
@@ -58,7 +58,7 @@ impl<'b> CharacterCache for GlyphCache<'b> {
     type Texture = GlyphTexture;
 
     fn character<'a>(&'a mut self, font_size: FontSize, character: char)
-        -> &'a Character<GlyphTexture> 
+        -> &'a Character<GlyphTexture>
     {
         use std::collections::hash_map::Entry::{Vacant, Occupied};
         let size_cache: &'a mut HashMap<char, _> = match self.data.entry(font_size) {
