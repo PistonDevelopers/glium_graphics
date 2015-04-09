@@ -10,7 +10,7 @@ authors = [
 image = "0.3"
 
 [dev-dependencies]
-glutin = "0.0.22"
+glutin = "0.0"
 
 [dependencies.freetype-rs]
 git = "https://github.com/PistonDevelopers/freetype-rs"
@@ -26,5 +26,5 @@ git = "https://github.com/PistonDevelopers/shader_version"
 
 [dependencies.glium]
 version = "0.2"
-features = ["image", "gl_read_buffer"]
+features = ["image"]
 default_features = false

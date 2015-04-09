@@ -1,14 +1,16 @@
 use std::sync::Arc;
 use std::default::Default;
-use graphics::{self, DrawState, ImageSize, Graphics};
-use glium::{Display, Surface, Texture2d, Texture, Program, VertexBuffer,
-            DrawParameters, BlendingFunction, LinearBlendingFactor};
-use glium::index::{NoIndices, PrimitiveType};
+use graphics::{ self, DrawState, ImageSize, Graphics };
+use glium::{
+    Display, Surface, Texture2d,
+    Texture, Program, VertexBuffer,
+    DrawParameters, BlendingFunction, LinearBlendingFactor
+};
+use glium::index::{ NoIndices, PrimitiveType };
 use shader_version::Shaders;
 use shader_version::glsl::GLSL;
 
-use shader;
-use OpenGL;
+use { shader, OpenGL };
 
 
 #[derive(Clone)]
@@ -117,10 +119,10 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
 
     /// Clears background with a color.
     fn clear(&mut self, color: [f32; 4]) {
-        let [r, g, b, a] = color;
+        let (r, g, b, a) = (color[0], color[1], color[2], color[3]);
         self.surface.clear_color(r, g, b, a);
     }
-    
+
     fn clear_stencil(&mut self, value: u8) {
         self.surface.clear_stencil(value as i32);
     }
