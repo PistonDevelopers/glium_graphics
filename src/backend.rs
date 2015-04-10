@@ -2,15 +2,15 @@ use std::sync::Arc;
 use std::default::Default;
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
-    Display, Surface, Texture2d,
-    Texture, Program, VertexBuffer,
+    Surface, Texture2d, Texture, Program, VertexBuffer,
     DrawParameters, BlendingFunction, LinearBlendingFactor
 };
 use glium::index::{ NoIndices, PrimitiveType };
-use shader_version::Shaders;
+use glium::backend::Facade;
+use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
 
-use { shader, OpenGL };
+use shader;
 
 
 #[derive(Clone)]
@@ -61,37 +61,37 @@ pub struct Glium2d {
 }
 
 impl Glium2d {
-    pub fn new(opengl: OpenGL, display: &Display) -> Glium2d {
+    pub fn new<W>(opengl: OpenGL, window: &W) -> Glium2d where W: Facade {
         // FIXME: create empty buffers when glium supports them
         let plain_data = ::std::iter::repeat(PlainVertex { position: [0.0, 0.0] })
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
         let textured_data = ::std::iter::repeat(TexturedVertex { position: [0.0, 0.0], texcoord: [0.0, 0.0] })
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
-
+        let glsl = opengl.to_GLSL();
         Glium2d {
             next_plain_buffer: 0,
-            plain_buffer1: VertexBuffer::new(display, plain_data.clone()),
-            plain_buffer2: VertexBuffer::new(display, plain_data),
+            plain_buffer1: VertexBuffer::new(window, plain_data.clone()),
+            plain_buffer2: VertexBuffer::new(window, plain_data),
             next_textured_buffer: 0,
-            textured_buffer1: VertexBuffer::new(display, textured_data.clone()),
-            textured_buffer2: VertexBuffer::new(display, textured_data),
+            textured_buffer1: VertexBuffer::new(window, textured_data.clone()),
+            textured_buffer2: VertexBuffer::new(window, textured_data),
             shader_texture:
-                Program::from_source(display,
+                Program::from_source(window,
                                      Shaders::new().set(GLSL::_1_20, shader::VS_TEXTURED_120)
                                                    .set(GLSL::_1_50, shader::VS_TEXTURED_150)
-                                                   .get(opengl.to_GLSL()).unwrap(),
+                                                   .get(glsl).unwrap(),
                                      Shaders::new().set(GLSL::_1_20, shader::FS_TEXTURED_120)
                                                    .set(GLSL::_1_50, shader::FS_TEXTURED_150)
-                                                   .get(opengl.to_GLSL()).unwrap(),
+                                                   .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize textured shader"),
             shader_color:
-                Program::from_source(display,
+                Program::from_source(window,
                                      Shaders::new().set(GLSL::_1_20, shader::VS_COLORED_120)
                                                    .set(GLSL::_1_50, shader::VS_COLORED_150)
-                                                   .get(opengl.to_GLSL()).unwrap(),
+                                                   .get(glsl).unwrap(),
                                      Shaders::new().set(GLSL::_1_20, shader::FS_COLORED_120)
                                                    .set(GLSL::_1_50, shader::FS_COLORED_150)
-                                                   .get(opengl.to_GLSL()).unwrap(),
+                                                   .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize colored shader"),
         }
     }
