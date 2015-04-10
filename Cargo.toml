@@ -14,9 +14,6 @@ homepage = "https://github.com/PistonDevelopers/glium_graphics"
 [dependencies]
 image = "0.3"
 
-[dev-dependencies]
-glutin = "0.0"
-
 [dependencies.freetype-rs]
 git = "https://github.com/PistonDevelopers/freetype-rs"
 #version = "0.0.8"
@@ -36,3 +33,9 @@ git = "https://github.com/PistonDevelopers/window"
 version = "0.2"
 features = ["image"]
 default_features = false
+
+[dev-dependencies.piston]
+git = "https://github.com/PistonDevelopers/piston"
+
+[dev-dependencies.pistoncore-sdl2_window]
+git = "https://github.com/PistonDevelopers/sdl2_window"
