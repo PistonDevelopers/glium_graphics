@@ -33,7 +33,7 @@ fn main() {
     });
 
     let mut g2d = Glium2d::new(opengl, glium_window);
-    let transform = graphics::abs_transform(w as f64, h as f64);
+    let transform = graphics::math::abs_transform(w as f64, h as f64);
 
     for e in window.events() {
         if let Some(_) = e.render_args() {
