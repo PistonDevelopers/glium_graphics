@@ -6,9 +6,11 @@ use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame };
 use self::window::{ OpenGLWindow, ProcAddress };
 
+#[derive(Clone)]
 struct Wrapper<W>(Rc<RefCell<W>>);
 
 /// A window struct for glium.
+#[derive(Clone)]
 pub struct GliumWindow(Rc<Context>);
 
 impl GliumWindow {
