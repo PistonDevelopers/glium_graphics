@@ -141,11 +141,11 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             let slice = match self.system.next_plain_buffer {
                 0 => {
                     self.system.next_plain_buffer = 1;
-                    self.system.plain_buffer1.slice(0, vertices.len() / 2).unwrap()
+                    self.system.plain_buffer1.slice(0..vertices.len() / 2).unwrap()
                 },
                 1 => {
                     self.system.next_plain_buffer = 0;
-                    self.system.plain_buffer2.slice(0, vertices.len() / 2).unwrap()
+                    self.system.plain_buffer2.slice(0..vertices.len() / 2).unwrap()
                 },
                 _ => unreachable!()
             };
@@ -197,11 +197,11 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             let slice = match self.system.next_textured_buffer {
                 0 => {
                     self.system.next_textured_buffer = 1;
-                    self.system.textured_buffer1.slice(0, len).unwrap()
+                    self.system.textured_buffer1.slice(0..len).unwrap()
                 },
                 1 => {
                     self.system.next_textured_buffer = 0;
-                    self.system.textured_buffer2.slice(0, len).unwrap()
+                    self.system.textured_buffer2.slice(0..len).unwrap()
                 },
                 _ => unreachable!()
             };

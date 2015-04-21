@@ -30,7 +30,7 @@ git = "https://github.com/PistonDevelopers/shader_version"
 git = "https://github.com/PistonDevelopers/window"
 
 [dependencies.glium]
-version = "0.2"
+version = "0.3"
 features = ["image"]
 default_features = false
 
