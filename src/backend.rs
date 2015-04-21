@@ -10,9 +10,6 @@ use glium::backend::Facade;
 use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
 
-use shader;
-
-
 #[derive(Clone)]
 pub struct DrawTexture {
     texture: Arc<Texture2d>,
@@ -34,19 +31,19 @@ impl ImageSize for DrawTexture {
 
 #[derive(Copy, Clone)]
 struct PlainVertex {
-    position: [f32; 2],
+    pos: [f32; 2],
 }
 
-implement_vertex!(PlainVertex, position);
+implement_vertex!(PlainVertex, pos);
 
 
 #[derive(Copy, Clone)]
 struct TexturedVertex {
-    position: [f32; 2],
-    texcoord: [f32; 2],
+    pos: [f32; 2],
+    uv: [f32; 2],
 }
 
-implement_vertex!(TexturedVertex, position, texcoord);
+implement_vertex!(TexturedVertex, pos, uv);
 
 
 pub struct Glium2d {
@@ -62,10 +59,14 @@ pub struct Glium2d {
 
 impl Glium2d {
     pub fn new<W>(opengl: OpenGL, window: &W) -> Glium2d where W: Facade {
+        use shaders::{ colored, textured };
+
+        let src = |bytes| { unsafe { ::std::str::from_utf8_unchecked(bytes) } };
+
         // FIXME: create empty buffers when glium supports them
-        let plain_data = ::std::iter::repeat(PlainVertex { position: [0.0, 0.0] })
+        let plain_data = ::std::iter::repeat(PlainVertex { pos: [0.0, 0.0] })
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
-        let textured_data = ::std::iter::repeat(TexturedVertex { position: [0.0, 0.0], texcoord: [0.0, 0.0] })
+        let textured_data = ::std::iter::repeat(TexturedVertex { pos: [0.0, 0.0], uv: [0.0, 0.0] })
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
         let glsl = opengl.to_GLSL();
         Glium2d {
@@ -77,20 +78,20 @@ impl Glium2d {
             textured_buffer2: VertexBuffer::new(window, textured_data),
             shader_texture:
                 Program::from_source(window,
-                                     Shaders::new().set(GLSL::_1_20, shader::VS_TEXTURED_120)
-                                                   .set(GLSL::_1_50, shader::VS_TEXTURED_150)
+                                     Shaders::new().set(GLSL::_1_20, src(textured::VERTEX_GLSL_120))
+                                                   .set(GLSL::_1_50, src(textured::VERTEX_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
-                                     Shaders::new().set(GLSL::_1_20, shader::FS_TEXTURED_120)
-                                                   .set(GLSL::_1_50, shader::FS_TEXTURED_150)
+                                     Shaders::new().set(GLSL::_1_20, src(textured::FRAGMENT_GLSL_120))
+                                                   .set(GLSL::_1_50, src(textured::FRAGMENT_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize textured shader"),
             shader_color:
                 Program::from_source(window,
-                                     Shaders::new().set(GLSL::_1_20, shader::VS_COLORED_120)
-                                                   .set(GLSL::_1_50, shader::VS_COLORED_150)
+                                     Shaders::new().set(GLSL::_1_20, src(colored::VERTEX_GLSL_120))
+                                                   .set(GLSL::_1_50, src(colored::VERTEX_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
-                                     Shaders::new().set(GLSL::_1_20, shader::FS_COLORED_120)
-                                                   .set(GLSL::_1_50, shader::FS_COLORED_150)
+                                     Shaders::new().set(GLSL::_1_20, src(colored::FRAGMENT_GLSL_120))
+                                                   .set(GLSL::_1_50, src(colored::FRAGMENT_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize colored shader"),
         }
@@ -153,7 +154,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             slice.write({
                 (0..vertices.len() / 2)
                     .map(|i| PlainVertex {
-                        position: [vertices[2 * i], vertices[2 * i + 1]],
+                        pos: [vertices[2 * i], vertices[2 * i + 1]],
                     })
                     .collect()
             });
@@ -209,9 +210,9 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             slice.write({
                 (0..len)
                     .map(|i| TexturedVertex {
-                        position: [vertices[2 * i], vertices[2 * i + 1]],
+                        pos: [vertices[2 * i], vertices[2 * i + 1]],
                         // FIXME: The `1.0 - ...` is because of a wrong convention
-                        texcoord: [texture_coords[2 * i], 1.0 - texture_coords[2 * i + 1]],
+                        uv: [texture_coords[2 * i], 1.0 - texture_coords[2 * i + 1]],
                     })
                     .collect()
             });

@@ -4,6 +4,7 @@ extern crate glium;
 extern crate graphics;
 extern crate image;
 extern crate shader_version;
+extern crate shaders_graphics2d as shaders;
 
 pub use window::GliumWindow;
 pub use glyph_cache::{ GlyphCache, GlyphTexture };
@@ -13,5 +14,4 @@ pub use backend::GliumGraphics as GliumSurfaceBackEnd;
 
 mod glyph_cache;
 mod backend;
-mod shader;
 mod window;
