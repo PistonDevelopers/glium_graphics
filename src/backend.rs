@@ -118,7 +118,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     type Texture = DrawTexture;
 
     /// Clears background with a color.
-    fn clear(&mut self, color: [f32; 4]) {
+    fn clear_color(&mut self, color: [f32; 4]) {
         let (r, g, b, a) = (color[0], color[1], color[2], color[3]);
         self.surface.clear_color(r, g, b, a);
     }
