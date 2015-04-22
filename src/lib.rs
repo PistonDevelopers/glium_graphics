@@ -8,10 +8,10 @@ extern crate shaders_graphics2d as shaders;
 
 pub use window::GliumWindow;
 pub use glyph_cache::{ GlyphCache, GlyphTexture };
-pub use backend::{ Glium2d, GliumGraphics, DrawTexture };
-pub use backend::Glium2d as GliumBackendSystem;
-pub use backend::GliumGraphics as GliumSurfaceBackEnd;
+pub use back_end::{ Glium2d, GliumGraphics, DrawTexture };
+pub use back_end::Glium2d as GliumBackendSystem;
+pub use back_end::GliumGraphics as GliumSurfaceBackEnd;
 
 mod glyph_cache;
-mod backend;
+mod back_end;
 mod window;
