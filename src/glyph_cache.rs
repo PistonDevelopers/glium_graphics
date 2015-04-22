@@ -1,37 +1,34 @@
+use std::path::Path;
 use std::collections::HashMap;
 use graphics::character::{ CharacterCache, Character };
 use graphics::types::FontSize;
-use graphics::ImageSize;
-use glium::{ Texture2d, Texture, Display };
-use image::{ Luma, ImageBuffer };
+use glium::Texture2d;
+use glium::backend::Facade;
+use image::{ Rgba, ImageBuffer };
 use freetype::{ self, Face };
+use ::back_end::DrawTexture;
 
 
-pub struct GlyphTexture(pub Texture2d);
-
-impl ImageSize for GlyphTexture {
-    fn get_size(&self) -> (u32, u32) {
-        let GlyphTexture(ref tex) = *self;
-        (tex.get_width(), tex.get_height().unwrap())
-    }
-}
-
-
-fn load_character(face: &Face, display: &Display, font_size: FontSize, character: char)
-    -> Character<GlyphTexture>
+fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
+                             character: char)
+    -> Character<DrawTexture>
 {
     face.set_pixel_sizes(0, font_size).unwrap();
     face.load_char(character as usize, freetype::face::DEFAULT).unwrap();
     let glyph = face.glyph().get_glyph().unwrap();
     let bitmap_glyph = glyph.to_bitmap(freetype::render_mode::RenderMode::Normal, None).unwrap();
     let bitmap = bitmap_glyph.bitmap();
-    let texture = Texture2d::new(
-        display,
-        ImageBuffer::<Luma<u8>, _>::from_raw(
-            bitmap.width() as u32, bitmap.rows() as u32,
-            bitmap.buffer().iter().map(|&pix| pix).collect::<Vec<_>>()
-        ).expect("failed to create glyph texture")
-    );
+    let texture =
+        if bitmap.width() != 0 { Texture2d::new(
+            facade,
+            ImageBuffer::<Rgba<u8>, _>::from_raw(
+                bitmap.width() as u32, bitmap.rows() as u32,
+                bitmap.buffer().iter()
+                    .flat_map(|&pix| vec![255, 255, 255, pix].into_iter())
+                    .collect::<Vec<_>>()
+            ).expect("failed to create glyph texture")
+        ) }
+        else { Texture2d::empty(facade, 1, 1) };
     let glyph_size = glyph.advance();
     Character {
         offset: [
@@ -42,23 +39,35 @@ fn load_character(face: &Face, display: &Display, font_size: FontSize, character
             (glyph_size.x >> 16) as f64,
             (glyph_size.y >> 16) as f64
         ],
-        texture: GlyphTexture(texture),
+        texture: DrawTexture::new(texture),
     }
 }
 
 
-pub struct GlyphCache<'a> {
-    face: Face<'a>,
-    data: HashMap<FontSize, HashMap<char, Character<GlyphTexture>>>,
-    display: Display,
+pub struct GlyphCache<F> {
+    face: Face<'static>,
+    data: HashMap<FontSize, HashMap<char, Character<DrawTexture>>>,
+    facade: F,
 }
 
+impl<F> GlyphCache<F> {
+     /// Constructor for a GlyphCache.
+    pub fn new(font: &Path, facade: F) -> Result<Self, freetype::error::Error> {
+        let freetype = try!(freetype::Library::init());
+        let face = try!(freetype.new_face(font, 0));
+        Ok(GlyphCache {
+            face: face,
+            data: HashMap::new(),
+            facade: facade,
+        })
+    }
+}
 
-impl<'b> CharacterCache for GlyphCache<'b> {
-    type Texture = GlyphTexture;
+impl<F: Facade> CharacterCache for GlyphCache<F> {
+    type Texture = DrawTexture;
 
     fn character<'a>(&'a mut self, font_size: FontSize, character: char)
-        -> &'a Character<GlyphTexture>
+        -> &'a Character<DrawTexture>
     {
         use std::collections::hash_map::Entry::{Vacant, Occupied};
         let size_cache: &'a mut HashMap<char, _> = match self.data.entry(font_size) {
@@ -66,7 +75,7 @@ impl<'b> CharacterCache for GlyphCache<'b> {
             Occupied(entry) => entry.into_mut(),
         };
         match size_cache.entry(character) {
-            Vacant(entry) => entry.insert(load_character(&self.face, &self.display, font_size, character)),
+            Vacant(entry) => entry.insert(load_character(&self.face, &self.facade, font_size, character)),
             Occupied(entry) => entry.into_mut(),
         }
     }
