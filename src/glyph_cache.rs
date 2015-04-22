@@ -18,15 +18,17 @@ fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
     let glyph = face.glyph().get_glyph().unwrap();
     let bitmap_glyph = glyph.to_bitmap(freetype::render_mode::RenderMode::Normal, None).unwrap();
     let bitmap = bitmap_glyph.bitmap();
-    let texture = Texture2d::new(
-        facade,
-        ImageBuffer::<Rgba<u8>, _>::from_raw(
-            bitmap.width() as u32, bitmap.rows() as u32,
-            bitmap.buffer().iter()
-                .flat_map(|&pix| vec![255, 255, 255, pix].into_iter())
-                .collect::<Vec<_>>()
-        ).expect("failed to create glyph texture")
-    );
+    let texture =
+        if bitmap.width() != 0 { Texture2d::new(
+            facade,
+            ImageBuffer::<Rgba<u8>, _>::from_raw(
+                bitmap.width() as u32, bitmap.rows() as u32,
+                bitmap.buffer().iter()
+                    .flat_map(|&pix| vec![255, 255, 255, pix].into_iter())
+                    .collect::<Vec<_>>()
+            ).expect("failed to create glyph texture")
+        ) }
+        else { Texture2d::empty(facade, 1, 1) };
     let glyph_size = glyph.advance();
     Character {
         offset: [
