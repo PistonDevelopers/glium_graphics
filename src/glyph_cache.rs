@@ -4,9 +4,9 @@ use graphics::character::{ CharacterCache, Character };
 use graphics::types::FontSize;
 use glium::Texture2d;
 use glium::backend::Facade;
-use image::{ Luma, ImageBuffer };
+use image::{ Rgba, ImageBuffer };
 use freetype::{ self, Face };
-use ::backend::DrawTexture;
+use ::back_end::DrawTexture;
 
 
 fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
@@ -20,9 +20,11 @@ fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
     let bitmap = bitmap_glyph.bitmap();
     let texture = Texture2d::new(
         facade,
-        ImageBuffer::<Luma<u8>, _>::from_raw(
+        ImageBuffer::<Rgba<u8>, _>::from_raw(
             bitmap.width() as u32, bitmap.rows() as u32,
-            bitmap.buffer().iter().map(|&pix| pix).collect::<Vec<_>>()
+            bitmap.buffer().iter()
+                .flat_map(|&pix| vec![255, 255, 255, pix].into_iter())
+                .collect::<Vec<_>>()
         ).expect("failed to create glyph texture")
     );
     let glyph_size = glyph.advance();
