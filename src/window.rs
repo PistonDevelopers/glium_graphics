@@ -15,7 +15,7 @@ pub struct GliumWindow(Rc<Context>);
 
 impl GliumWindow {
     /// Creates new GliumWindow.
-    pub fn new<W>(window: &Rc<RefCell<W>>) -> Result<Self, GliumCreationError>
+    pub fn new<W>(window: &Rc<RefCell<W>>) -> Result<Self, GliumCreationError<()>>
         where W: OpenGLWindow + 'static
     {
         unsafe {
