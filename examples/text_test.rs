@@ -30,7 +30,9 @@ fn main() {
 
     let mut g2d = Glium2d::new(opengl, glium_window);
 
-    for _ in window.events().filter_map(|event| event.render_args()) {
+    for _ in window.events().swap_buffers(false)
+        .filter_map(|event| event.render_args())
+    {    
         let mut target = glium_window.draw();
         {
             use graphics::*;
