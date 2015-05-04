@@ -73,11 +73,11 @@ impl Glium2d {
         let glsl = opengl.to_GLSL();
         Glium2d {
             next_plain_buffer: 0,
-            plain_buffer1: VertexBuffer::new(window, plain_data.clone()),
-            plain_buffer2: VertexBuffer::new(window, plain_data),
+            plain_buffer1: VertexBuffer::dynamic(window, plain_data.clone()),
+            plain_buffer2: VertexBuffer::dynamic(window, plain_data),
             next_textured_buffer: 0,
-            textured_buffer1: VertexBuffer::new(window, textured_data.clone()),
-            textured_buffer2: VertexBuffer::new(window, textured_data),
+            textured_buffer1: VertexBuffer::dynamic(window, textured_data.clone()),
+            textured_buffer2: VertexBuffer::dynamic(window, textured_data),
             shader_texture:
                 Program::from_source(window,
                                      Shaders::new().set(GLSL::_1_20, src(textured::VERTEX_GLSL_120))
