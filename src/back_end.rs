@@ -10,12 +10,14 @@ use glium::backend::Facade;
 use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
 
+/// Wrapper for 2D texture.
 #[derive(Clone)]
 pub struct DrawTexture {
     texture: Arc<Texture2d>,
 }
 
 impl DrawTexture {
+    /// Creates a new `DrawTexture`.
     pub fn new(texture: Texture2d) -> DrawTexture {
         DrawTexture { texture: Arc::new(texture) }
     }
@@ -45,7 +47,7 @@ struct TexturedVertex {
 
 implement_vertex!(TexturedVertex, pos, uv);
 
-
+/// The resources needed for rendering 2D.
 pub struct Glium2d {
     next_plain_buffer: u32,
     plain_buffer1: VertexBuffer<PlainVertex>,
@@ -58,6 +60,7 @@ pub struct Glium2d {
 }
 
 impl Glium2d {
+    /// Creates a new `Glium2d`.
     pub fn new<W>(opengl: OpenGL, window: &W) -> Glium2d where W: Facade {
         use shaders::{ colored, textured };
 
@@ -99,12 +102,14 @@ impl Glium2d {
 }
 
 
+/// Graphics back-end.
 pub struct GliumGraphics<'d, 's, S: 's> {
     system: &'d mut Glium2d,
     surface: &'s mut S,
 }
 
 impl<'d, 's, S> GliumGraphics<'d, 's, S> {
+    /// Creates a new graphics object.
     pub fn new(system: &'d mut Glium2d, surface: &'s mut S)
                -> GliumGraphics<'d, 's, S> {
         GliumGraphics {

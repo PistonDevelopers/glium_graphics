@@ -1,3 +1,7 @@
+#![deny(missing_docs)]
+
+//! A Piston 2D graphics back-end using Glium.
+
 extern crate freetype;
 #[macro_use(uniform, implement_vertex)]
 extern crate glium;

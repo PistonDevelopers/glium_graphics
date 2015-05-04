@@ -43,7 +43,7 @@ fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
     }
 }
 
-
+/// Caches characters for a font.
 pub struct GlyphCache<F> {
     face: Face<'static>,
     data: HashMap<FontSize, HashMap<char, Character<DrawTexture>>>,
