@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use std::default::Default;
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
@@ -11,15 +10,15 @@ use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
 
 /// Wrapper for 2D texture.
-#[derive(Clone)]
 pub struct DrawTexture {
-    texture: Arc<Texture2d>,
+    /// The Glium texture.
+    pub texture: Texture2d,
 }
 
 impl DrawTexture {
     /// Creates a new `DrawTexture`.
     pub fn new(texture: Texture2d) -> DrawTexture {
-        DrawTexture { texture: Arc::new(texture) }
+        DrawTexture { texture: texture }
     }
 }
 
@@ -222,7 +221,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
-            let texture = &*(texture.texture);
+            let texture = &texture.texture;
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
