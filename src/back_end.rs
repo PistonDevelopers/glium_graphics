@@ -48,10 +48,10 @@ implement_vertex!(TexturedVertex, pos, uv);
 
 /// The resources needed for rendering 2D.
 pub struct Glium2d {
-    next_plain_buffer: u32,
+    next_plain_buffer: u8,
+    next_textured_buffer: u8,
     plain_buffer1: VertexBuffer<PlainVertex>,
     plain_buffer2: VertexBuffer<PlainVertex>,
-    next_textured_buffer: u32,
     textured_buffer1: VertexBuffer<TexturedVertex>,
     textured_buffer2: VertexBuffer<TexturedVertex>,
     shader_texture: Program,
