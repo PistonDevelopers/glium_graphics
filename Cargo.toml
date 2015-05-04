@@ -1,6 +1,6 @@
 [package]
 name = "glium_graphics"
-version = "0.0.10"
+version = "0.0.11"
 authors = [
     "Eduard Bopp <eduard.bopp@aepsil0n.de>",
     "bvssvni <bvssvni@gmail.com>"
