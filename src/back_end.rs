@@ -48,12 +48,8 @@ implement_vertex!(TexturedVertex, pos, uv);
 
 /// The resources needed for rendering 2D.
 pub struct Glium2d {
-    next_plain_buffer: u8,
-    next_textured_buffer: u8,
-    plain_buffer1: VertexBuffer<PlainVertex>,
-    plain_buffer2: VertexBuffer<PlainVertex>,
-    textured_buffer1: VertexBuffer<TexturedVertex>,
-    textured_buffer2: VertexBuffer<TexturedVertex>,
+    plain_buffer: VertexBuffer<PlainVertex>,
+    textured_buffer: VertexBuffer<TexturedVertex>,
     shader_texture: Program,
     shader_color: Program,
 }
@@ -72,12 +68,8 @@ impl Glium2d {
                                 .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
         let glsl = opengl.to_GLSL();
         Glium2d {
-            next_plain_buffer: 0,
-            plain_buffer1: VertexBuffer::dynamic(window, plain_data.clone()),
-            plain_buffer2: VertexBuffer::dynamic(window, plain_data),
-            next_textured_buffer: 0,
-            textured_buffer1: VertexBuffer::dynamic(window, textured_data.clone()),
-            textured_buffer2: VertexBuffer::dynamic(window, textured_data),
+            plain_buffer: VertexBuffer::dynamic(window, plain_data),
+            textured_buffer: VertexBuffer::dynamic(window, textured_data),
             shader_texture:
                 Program::from_source(window,
                                      Shaders::new().set(GLSL::_1_20, src(textured::VERTEX_GLSL_120))
@@ -143,17 +135,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         where F: FnMut(&mut FnMut(&[f32]))
     {
         f(&mut |vertices: &[f32]| {
-            let slice = match self.system.next_plain_buffer {
-                0 => {
-                    self.system.next_plain_buffer = 1;
-                    self.system.plain_buffer1.slice(0..vertices.len() / 2).unwrap()
-                },
-                1 => {
-                    self.system.next_plain_buffer = 0;
-                    self.system.plain_buffer2.slice(0..vertices.len() / 2).unwrap()
-                },
-                _ => unreachable!()
-            };
+            let slice = self.system.plain_buffer.slice(0..vertices.len() / 2).unwrap();
 
             slice.write({
                 (0 .. vertices.len() / 2)
@@ -199,17 +181,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         f(&mut |vertices: &[f32], texture_coords: &[f32]| {
             let len = min(vertices.len(), texture_coords.len()) / 2;
 
-            let slice = match self.system.next_textured_buffer {
-                0 => {
-                    self.system.next_textured_buffer = 1;
-                    self.system.textured_buffer1.slice(0..len).unwrap()
-                },
-                1 => {
-                    self.system.next_textured_buffer = 0;
-                    self.system.textured_buffer2.slice(0..len).unwrap()
-                },
-                _ => unreachable!()
-            };
+            let slice = self.system.textured_buffer.slice(0..len).unwrap();
 
             slice.write({
                 (0 .. len)
