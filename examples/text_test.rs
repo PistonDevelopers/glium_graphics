@@ -1,6 +1,6 @@
 extern crate piston;
 extern crate graphics;
-extern crate sdl2_window;
+extern crate glutin_window;
 extern crate glium_graphics;
 
 use std::cell::RefCell;
@@ -9,13 +9,13 @@ use std::path::Path;
 use piston::window::{ WindowSettings, Size };
 use piston::event::*;
 use glium_graphics::{ GliumGraphics, Glium2d, GliumWindow, GlyphCache };
-use sdl2_window::{ Sdl2Window, OpenGL };
+use glutin_window::{ GlutinWindow, OpenGL };
 
 fn main() {
     let opengl = OpenGL::_3_2;
     let size = Size { width: 500, height: 300 };
     let ref window = Rc::new(RefCell::new(
-        Sdl2Window::new(
+        GlutinWindow::new(
             opengl,
             WindowSettings::new("gfx_graphics: text_test", size)
                 .exit_on_esc(true)
