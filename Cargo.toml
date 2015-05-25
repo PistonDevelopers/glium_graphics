@@ -18,24 +18,24 @@ name = "glium_graphics"
 image = "0.3"
 
 [dependencies.freetype-rs]
-git = "https://github.com/PistonDevelopers/freetype-rs"
-#version = "0.0.9"
+#git = "https://github.com/PistonDevelopers/freetype-rs"
+version = "0.0.9"
 
 [dependencies.piston2d-graphics]
-git = "https://github.com/PistonDevelopers/graphics"
-#version = "0.0.45"
+#git = "https://github.com/PistonDevelopers/graphics"
+version = "0.0.47"
 
 [dependencies.shader_version]
-git = "https://github.com/PistonDevelopers/shader_version"
-#version = "0.0.6"
+#git = "https://github.com/PistonDevelopers/shader_version"
+version = "0.0.6"
 
 [dependencies.piston-shaders_graphics2d]
-git = "https://github.com/PistonDevelopers/shaders"
-#version = "0.0.0"
+#git = "https://github.com/PistonDevelopers/shaders"
+version = "0.0.0"
 
 [dependencies.pistoncore-window]
-git = "https://github.com/PistonDevelopers/window"
-#version = "0.1.1"
+#git = "https://github.com/PistonDevelopers/window"
+version = "0.1.1"
 
 [dependencies.glium]
 version = "0.3"
@@ -43,10 +43,9 @@ features = ["image"]
 default_features = false
 
 [dev-dependencies.piston]
-git = "https://github.com/PistonDevelopers/piston"
-#version = "0.1.1"
+#git = "https://github.com/PistonDevelopers/piston"
+version = "0.1.1"
 
-[dev-dependencies.pistoncore-sdl2_window]
-git = "https://github.com/PistonDevelopers/sdl2_window"
-#version = "0.0.12"
-
+[dev-dependencies.pistoncore-glutin_window]
+#git = "https://github.com/PistonDevelopers/glutin_window"
+version = "0.0.8"
