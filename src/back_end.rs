@@ -60,16 +60,11 @@ impl Glium2d {
         use shaders::{ colored, textured };
 
         let src = |bytes| { unsafe { ::std::str::from_utf8_unchecked(bytes) } };
-
-        // FIXME: create empty buffers when glium supports them
-        let plain_data = ::std::iter::repeat(PlainVertex { pos: [0.0, 0.0] })
-                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
-        let textured_data = ::std::iter::repeat(TexturedVertex { pos: [0.0, 0.0], uv: [0.0, 0.0] })
-                                .take(graphics::BACK_END_MAX_VERTEX_COUNT).collect::<Vec<_>>();
         let glsl = opengl.to_GLSL();
+
         Glium2d {
-            plain_buffer: VertexBuffer::dynamic(window, plain_data),
-            textured_buffer: VertexBuffer::dynamic(window, textured_data),
+            plain_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT),
+            textured_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT),
             shader_texture:
                 Program::from_source(window,
                                      Shaders::new().set(GLSL::_1_20, src(textured::VERTEX_GLSL_120))
