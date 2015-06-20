@@ -14,12 +14,9 @@ use glutin_window::{ GlutinWindow, OpenGL };
 fn main() {
     let opengl = OpenGL::_3_2;
     let size = Size { width: 500, height: 300 };
-    let ref window = Rc::new(RefCell::new(
-        GlutinWindow::new(
-            opengl,
-            WindowSettings::new("gfx_graphics: text_test", size)
-                .exit_on_esc(true)
-        )
+    let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
+        WindowSettings::new("gfx_graphics: text_test", size)
+        .exit_on_esc(true).opengl(opengl).into()
     ));
 
     let ref glium_window = GliumWindow::new(window).unwrap();
