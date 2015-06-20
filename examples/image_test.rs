@@ -11,20 +11,15 @@ use std::path::Path;
 use glium::{ Surface, Texture2d };
 use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, GliumWindow };
 use piston::event::*;
-use piston::window::{ WindowSettings, Size };
+use piston::window::WindowSettings;
 use glutin_window::{ GlutinWindow, OpenGL };
 
 fn main() {
     let opengl = OpenGL::_3_2;
     let (w, h) = (300, 300);
-    let ref window = Rc::new(RefCell::new(
-        GlutinWindow::new(
-            opengl,
-            WindowSettings::new(
-                "glium_graphics: image_test".to_string(),
-                Size { width: w, height: h }
-            ).exit_on_esc(true)
-        )
+    let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
+        WindowSettings::new("glium_graphics: image_test", [w, h])
+        .exit_on_esc(true).into()
     ));
     let ref glium_window = GliumWindow::new(window).unwrap();
     let rust_logo = DrawTexture::new({
