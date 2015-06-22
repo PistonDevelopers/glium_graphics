@@ -135,6 +135,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         where F: FnMut(&mut FnMut(&[f32]))
     {
         f(&mut |vertices: &[f32]| {
+            self.system.plain_buffer.invalidate();
             let slice = self.system.plain_buffer.slice(0..vertices.len() / 2).unwrap();
 
             slice.write({
@@ -181,6 +182,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         f(&mut |vertices: &[f32], texture_coords: &[f32]| {
             let len = min(vertices.len(), texture_coords.len()) / 2;
 
+            self.system.textured_buffer.invalidate();
             let slice = self.system.textured_buffer.slice(0..len).unwrap();
 
             slice.write({
