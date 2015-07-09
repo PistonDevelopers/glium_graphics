@@ -3,7 +3,7 @@ extern crate window;
 use std::rc::Rc;
 use std::cell::RefCell;
 use glium::backend::{ Backend, Context, Facade };
-use glium::{ GliumCreationError, Frame };
+use glium::{ GliumCreationError, Frame, SwapBuffersError };
 use self::window::{ OpenGLWindow, ProcAddress };
 
 #[derive(Clone)]
@@ -36,8 +36,9 @@ impl Facade for GliumWindow {
 }
 
 unsafe impl<W> Backend for Wrapper<W> where W: OpenGLWindow {
-    fn swap_buffers(&self) {
+    fn swap_buffers(&self) -> Result<(), SwapBuffersError> {
         self.0.borrow_mut().swap_buffers();
+        Ok(())
     }
 
     unsafe fn get_proc_address(&self, proc_name: &str) -> ProcAddress {
