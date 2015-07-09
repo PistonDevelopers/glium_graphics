@@ -134,7 +134,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             let slice = self.system.plain_buffer.slice(0..vertices.len() / 2).unwrap();
 
             slice.write({
-                (0 .. vertices.len() / 2)
+                &(0 .. vertices.len() / 2)
                     .map(|i| PlainVertex {
                         pos: [vertices[2 * i], vertices[2 * i + 1]]
                     })
@@ -181,7 +181,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             let slice = self.system.textured_buffer.slice(0..len).unwrap();
 
             slice.write({
-                (0 .. len)
+                &(0 .. len)
                     .map(|i| TexturedVertex {
                         pos: [vertices[2 * i], vertices[2 * i + 1]],
                         // FIXME: The `1.0 - ...` is because of a wrong convention
