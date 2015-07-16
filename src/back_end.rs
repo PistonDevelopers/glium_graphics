@@ -60,27 +60,27 @@ impl Glium2d {
         use shaders::{ colored, textured };
 
         let src = |bytes| { unsafe { ::std::str::from_utf8_unchecked(bytes) } };
-        let glsl = opengl.to_GLSL();
+        let glsl = opengl.to_glsl();
 
         Glium2d {
             plain_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT),
             textured_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT),
             shader_texture:
                 Program::from_source(window,
-                                     Shaders::new().set(GLSL::_1_20, src(textured::VERTEX_GLSL_120))
-                                                   .set(GLSL::_1_50, src(textured::VERTEX_GLSL_150_CORE))
+                                     Shaders::new().set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
+                                                   .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
-                                     Shaders::new().set(GLSL::_1_20, src(textured::FRAGMENT_GLSL_120))
-                                                   .set(GLSL::_1_50, src(textured::FRAGMENT_GLSL_150_CORE))
+                                     Shaders::new().set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
+                                                   .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize textured shader"),
             shader_color:
                 Program::from_source(window,
-                                     Shaders::new().set(GLSL::_1_20, src(colored::VERTEX_GLSL_120))
-                                                   .set(GLSL::_1_50, src(colored::VERTEX_GLSL_150_CORE))
+                                     Shaders::new().set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
+                                                   .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
-                                     Shaders::new().set(GLSL::_1_20, src(colored::FRAGMENT_GLSL_120))
-                                                   .set(GLSL::_1_50, src(colored::FRAGMENT_GLSL_150_CORE))
+                                     Shaders::new().set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
+                                                   .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE))
                                                    .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize colored shader"),
         }

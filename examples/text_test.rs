@@ -12,7 +12,7 @@ use glium_graphics::{ GliumGraphics, Glium2d, GliumWindow, GlyphCache };
 use glutin_window::{ GlutinWindow, OpenGL };
 
 fn main() {
-    let opengl = OpenGL::_3_2;
+    let opengl = OpenGL::V3_2;
     let size = Size { width: 500, height: 300 };
     let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
         WindowSettings::new("gfx_graphics: text_test", size)
@@ -46,6 +46,6 @@ fn main() {
                 &mut g
             );
         }
-        target.finish();
+        target.finish().unwrap();
     }
 }
