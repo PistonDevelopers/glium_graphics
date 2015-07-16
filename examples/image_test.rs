@@ -15,7 +15,7 @@ use piston::window::WindowSettings;
 use glutin_window::{ GlutinWindow, OpenGL };
 
 fn main() {
-    let opengl = OpenGL::_3_2;
+    let opengl = OpenGL::V3_2;
     let (w, h) = (300, 300);
     let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
         WindowSettings::new("glium_graphics: image_test", [w, h])
@@ -49,7 +49,7 @@ fn main() {
                           &mut g);
                 image(&rust_logo, transform.trans(100.0, 100.0), &mut g);
             }
-            target.finish();
+            target.finish().unwrap();
         }
     }
 }
