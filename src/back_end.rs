@@ -63,8 +63,8 @@ impl Glium2d {
         let glsl = opengl.to_glsl();
 
         Glium2d {
-            plain_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT),
-            textured_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT),
+            plain_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT).unwrap(),
+            textured_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT).unwrap(),
             shader_texture:
                 Program::from_source(window,
                                      Shaders::new().set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
