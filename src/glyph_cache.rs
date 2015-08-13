@@ -29,17 +29,18 @@ fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
             ).expect("failed to create glyph texture")
         ) }
         else { Texture2d::empty(facade, 1, 1) };
-    let glyph_size = glyph.advance();
+    let glyph_size_x = glyph.advance_x();
+    let glyph_size_y = glyph.advance_y();
     Character {
         offset: [
             bitmap_glyph.left() as f64,
             bitmap_glyph.top() as f64
         ],
         size: [
-            (glyph_size.x >> 16) as f64,
-            (glyph_size.y >> 16) as f64
+            (glyph_size_x >> 16) as f64,
+            (glyph_size_y >> 16) as f64
         ],
-        texture: DrawTexture::new(texture),
+        texture: DrawTexture::new(texture.unwrap()),
     }
 }
 

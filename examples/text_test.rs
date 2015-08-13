@@ -7,7 +7,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::path::Path;
 use piston::window::{ WindowSettings, Size };
-use piston::event::*;
+use piston::event_loop::*;
+use piston::input::RenderEvent;
 use glium_graphics::{ GliumGraphics, Glium2d, GliumWindow, GlyphCache };
 use glutin_window::{ GlutinWindow, OpenGL };
 
@@ -16,7 +17,7 @@ fn main() {
     let size = Size { width: 500, height: 300 };
     let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
         WindowSettings::new("gfx_graphics: text_test", size)
-        .exit_on_esc(true).opengl(opengl).into()
+        .exit_on_esc(true).opengl(opengl).build().unwrap()
     ));
 
     let ref glium_window = GliumWindow::new(window).unwrap();
