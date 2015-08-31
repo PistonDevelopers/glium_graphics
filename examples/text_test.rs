@@ -39,7 +39,7 @@ fn main() {
                 graphics::math::abs_transform(size.width as f64, size.height as f64)
                 .trans(10.0, 100.0);
             clear([1.0; 4], &mut g);
-            text::Text::colored([0.0, 0.5, 0.0, 1.0], 32).draw(
+            text::Text::new_color([0.0, 0.5, 0.0, 1.0], 32).draw(
                 "Hello glium_graphics!",
                 &mut glyph_cache,
                 &default_draw_state(),
