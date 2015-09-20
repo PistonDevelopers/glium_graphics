@@ -2,7 +2,8 @@ use std::default::Default;
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
     Surface, Texture2d, Texture, Program, VertexBuffer,
-    DrawParameters, BlendingFunction, LinearBlendingFactor
+    DrawParameters, BlendingFunction, LinearBlendingFactor,
+    Blend
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
@@ -147,10 +148,17 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                 &self.system.shader_color,
                 &uniform! { color: *color },
                 &DrawParameters {
-                    blending_function: Some(BlendingFunction::Addition {
-                        source: LinearBlendingFactor::SourceAlpha,
-                        destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                    }),
+                    blend: Blend {
+                        color: BlendingFunction::Addition {
+                            source: LinearBlendingFactor::SourceAlpha,
+                            destination: LinearBlendingFactor::OneMinusSourceAlpha,
+                        },
+                        alpha: BlendingFunction::Addition {
+                            source: LinearBlendingFactor::One,
+                            destination: LinearBlendingFactor::One,
+                        },
+                        constant_value: (0.0, 0.0, 0.0, 0.0)
+                    },
                     .. Default::default()
                 },
             )
@@ -200,10 +208,17 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     s_texture: texture
                 },
                 &DrawParameters {
-                    blending_function: Some(BlendingFunction::Addition {
-                        source: LinearBlendingFactor::SourceAlpha,
-                        destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                    }),
+                    blend: Blend {
+                        color: BlendingFunction::Addition {
+                            source: LinearBlendingFactor::SourceAlpha,
+                            destination: LinearBlendingFactor::OneMinusSourceAlpha,
+                        },
+                        alpha: BlendingFunction::Addition {
+                            source: LinearBlendingFactor::One,
+                            destination: LinearBlendingFactor::One,
+                        },
+                        constant_value: (0.0, 0.0, 0.0, 0.0)
+                    },
                     .. Default::default()
                 },
             )
