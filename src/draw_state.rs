@@ -22,6 +22,88 @@ pub fn convert_scissor(rect: Option<draw_state::target::Rect>)
     })
 }
 
+fn convert_stencil_op(op: draw_state::state::StencilOp)
+-> glium::StencilOperation {
+    use graphics::draw_state::state::StencilOp;
+    use glium::StencilOperation;
+
+    match op {
+        StencilOp::Keep => StencilOperation::Keep,
+        StencilOp::Zero => StencilOperation::Zero,
+        StencilOp::Replace => StencilOperation::Replace,
+        StencilOp::IncrementClamp => StencilOperation::Increment,
+        StencilOp::IncrementWrap => StencilOperation::IncrementWrap,
+        StencilOp::DecrementClamp => StencilOperation::Decrement,
+        StencilOp::DecrementWrap => StencilOperation::DecrementWrap,
+        StencilOp::Invert => StencilOperation::Invert,
+    }
+}
+
+fn convert_stencil_test(
+    test: draw_state::state::Comparison,
+    mask_read: draw_state::target::Stencil
+) -> glium::StencilTest {
+    use graphics::draw_state::state::Comparison;
+    use glium::StencilTest;
+
+    match test {
+        Comparison::Never => StencilTest::AlwaysFail,
+        Comparison::Less => StencilTest::IfLess { mask: mask_read as u32 },
+        Comparison::LessEqual => StencilTest::IfLessOrEqual {
+                mask: mask_read as u32
+            },
+        Comparison::Equal => StencilTest::IfEqual { mask: mask_read as u32 },
+        Comparison::GreaterEqual => StencilTest::IfMoreOrEqual {
+                mask: mask_read as u32
+            },
+        Comparison::Greater => StencilTest::IfMore { mask: mask_read as u32 },
+        Comparison::NotEqual => StencilTest::IfNotEqual {
+                mask: mask_read as u32
+            },
+        Comparison::Always => StencilTest::AlwaysPass,
+    }
+}
+
+pub fn convert_stencil(
+    stencil: Option<draw_state::state::Stencil>,
+    primitive: &draw_state::state::Primitive
+)
+-> glium::draw_parameters::Stencil {
+    use graphics::draw_state::state::FrontFace;
+
+    match stencil {
+        None => Default::default(),
+        Some(stencil) => {
+            let (cc, ccw) = match primitive.front_face {
+                FrontFace::Clockwise => (stencil.front, stencil.back),
+                FrontFace::CounterClockwise => (stencil.back, stencil.front),
+            };
+            glium::draw_parameters::Stencil {
+                // Clockwise side.
+                test_clockwise: convert_stencil_test(cc.fun, cc.mask_read),
+                reference_value_clockwise: cc.value as i32,
+                write_mask_clockwise: cc.mask_write as u32,
+                fail_operation_clockwise: convert_stencil_op(cc.op_fail),
+                pass_depth_fail_operation_clockwise:
+                    convert_stencil_op(cc.op_depth_fail),
+                depth_pass_operation_clockwise:
+                    convert_stencil_op(cc.op_pass),
+                // Counter clockwise side.
+                test_counter_clockwise:
+                    convert_stencil_test(ccw.fun, ccw.mask_read),
+                reference_value_counter_clockwise: ccw.value as i32,
+                write_mask_counter_clockwise: ccw.mask_write as u32,
+                fail_operation_counter_clockwise:
+                    convert_stencil_op(ccw.op_fail),
+                pass_depth_fail_operation_counter_clockwise:
+                    convert_stencil_op(ccw.op_depth_fail),
+                depth_pass_operation_counter_clockwise:
+                    convert_stencil_op(ccw.op_pass),
+            }
+        }
+    }
+}
+
 fn convert_factor(factor: draw_state::state::Factor)
 -> glium::LinearBlendingFactor {
     use graphics::draw_state::state::{ BlendValue, Factor };

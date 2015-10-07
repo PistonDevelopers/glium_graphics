@@ -154,6 +154,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     scissor: draw_state::convert_scissor(draw_state.scissor),
                     multisampling:
                         draw_state::convert_multi_sample(draw_state.multi_sample),
+                    stencil: draw_state::convert_stencil(draw_state.stencil,
+                        &draw_state.primitive),
                     .. Default::default()
                 },
             )
@@ -209,6 +211,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     scissor: draw_state::convert_scissor(draw_state.scissor),
                     multisampling:
                         draw_state::convert_multi_sample(draw_state.multi_sample),
+                    stencil: draw_state::convert_stencil(draw_state.stencil,
+                        &draw_state.primitive),
                     .. Default::default()
                 },
             )
