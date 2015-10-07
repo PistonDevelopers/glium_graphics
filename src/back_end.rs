@@ -1,14 +1,13 @@
-use std::default::Default;
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
     Surface, Texture2d, Texture, Program, VertexBuffer,
-    DrawParameters, BlendingFunction, LinearBlendingFactor,
-    Blend
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
 use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
+
+use draw_state;
 
 /// Wrapper for 2D texture.
 pub struct DrawTexture {
@@ -124,7 +123,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     /// Renders list of 2d triangles.
     fn tri_list<F>(
         &mut self,
-        _draw_state: &DrawState,
+        draw_state: &DrawState,
         color: &[f32; 4],
         mut f: F
     )
@@ -147,20 +146,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                 &NoIndices(PrimitiveType::TrianglesList),
                 &self.system.shader_color,
                 &uniform! { color: *color },
-                &DrawParameters {
-                    blend: Blend {
-                        color: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::SourceAlpha,
-                            destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                        },
-                        alpha: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::One,
-                            destination: LinearBlendingFactor::One,
-                        },
-                        constant_value: (0.0, 0.0, 0.0, 0.0)
-                    },
-                    .. Default::default()
-                },
+                &draw_state::convert_draw_state(draw_state),
             )
             .ok()
             .expect("failed to draw triangle list");
@@ -173,7 +159,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     /// The texture coordinates refers to the current texture.
     fn tri_list_uv<F>(
         &mut self,
-        _draw_state: &DrawState,
+        draw_state: &DrawState,
         color: &[f32; 4],
         texture: &DrawTexture,
         mut f: F
@@ -207,20 +193,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     color: *color,
                     s_texture: texture
                 },
-                &DrawParameters {
-                    blend: Blend {
-                        color: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::SourceAlpha,
-                            destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                        },
-                        alpha: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::One,
-                            destination: LinearBlendingFactor::One,
-                        },
-                        constant_value: (0.0, 0.0, 0.0, 0.0)
-                    },
-                    .. Default::default()
-                },
+                &draw_state::convert_draw_state(draw_state),
             )
             .ok()
             .expect("failed to draw triangle list");
