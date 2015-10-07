@@ -2,6 +2,25 @@ use glium;
 use graphics::draw_state;
 use graphics::draw_state::state::BlendChannel;
 
+pub fn convert_draw_state(draw_state: &draw_state::DrawState)
+-> glium::draw_parameters::DrawParameters<'static> {
+    let (polygon_mode, line_width, point_size, cull) =
+        convert_primitive(draw_state.primitive);
+    glium::draw_parameters::DrawParameters {
+        blend: convert_blend(draw_state.blend),
+        color_mask: convert_color_mask(draw_state.color_mask),
+        scissor: convert_scissor(draw_state.scissor),
+        multisampling: convert_multi_sample(draw_state.multi_sample),
+        stencil: convert_stencil(draw_state.stencil, &draw_state.primitive),
+        depth: convert_depth(draw_state.depth),
+        polygon_mode: polygon_mode,
+        line_width: line_width,
+        point_size: point_size,
+        backface_culling: cull,
+        .. Default::default()
+    }
+}
+
 /// Returns polygon_mode, line_width, point_size, backface_cullingmode
 pub fn convert_primitive(p: draw_state::state::Primitive)
 -> (glium::draw_parameters::PolygonMode, Option<f32>, Option<f32>,

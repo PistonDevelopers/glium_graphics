@@ -1,7 +1,6 @@
-use std::default::Default;
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
-    Surface, Texture2d, Texture, Program, VertexBuffer, DrawParameters,
+    Surface, Texture2d, Texture, Program, VertexBuffer,
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
@@ -142,29 +141,12 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
-            let (polygon_mode, line_width, point_size, cull) =
-                draw_state::convert_primitive(draw_state.primitive);
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
                 &self.system.shader_color,
                 &uniform! { color: *color },
-                &DrawParameters {
-                    blend: draw_state::convert_blend(draw_state.blend),
-                    color_mask:
-                        draw_state::convert_color_mask(draw_state.color_mask),
-                    scissor: draw_state::convert_scissor(draw_state.scissor),
-                    multisampling:
-                        draw_state::convert_multi_sample(draw_state.multi_sample),
-                    stencil: draw_state::convert_stencil(draw_state.stencil,
-                        &draw_state.primitive),
-                    depth: draw_state::convert_depth(draw_state.depth),
-                    polygon_mode: polygon_mode,
-                    line_width: line_width,
-                    point_size: point_size,
-                    backface_culling: cull,
-                    .. Default::default()
-                },
+                &draw_state::convert_draw_state(draw_state),
             )
             .ok()
             .expect("failed to draw triangle list");
@@ -203,8 +185,6 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             });
 
             let texture = &texture.texture;
-            let (polygon_mode, line_width, point_size, cull) =
-                draw_state::convert_primitive(draw_state.primitive);
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
@@ -213,22 +193,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     color: *color,
                     s_texture: texture
                 },
-                &DrawParameters {
-                    blend: draw_state::convert_blend(draw_state.blend),
-                    color_mask:
-                        draw_state::convert_color_mask(draw_state.color_mask),
-                    scissor: draw_state::convert_scissor(draw_state.scissor),
-                    multisampling:
-                        draw_state::convert_multi_sample(draw_state.multi_sample),
-                    stencil: draw_state::convert_stencil(draw_state.stencil,
-                        &draw_state.primitive),
-                    depth: draw_state::convert_depth(draw_state.depth),
-                    polygon_mode: polygon_mode,
-                    line_width: line_width,
-                    point_size: point_size,
-                    backface_culling: cull,
-                    .. Default::default()
-                },
+                &draw_state::convert_draw_state(draw_state),
             )
             .ok()
             .expect("failed to draw triangle list");
