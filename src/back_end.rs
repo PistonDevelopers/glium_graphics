@@ -1,14 +1,14 @@
 use std::default::Default;
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
-    Surface, Texture2d, Texture, Program, VertexBuffer,
-    DrawParameters, BlendingFunction, LinearBlendingFactor,
-    Blend
+    Surface, Texture2d, Texture, Program, VertexBuffer, DrawParameters,
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
 use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
+
+use draw_state;
 
 /// Wrapper for 2D texture.
 pub struct DrawTexture {
@@ -124,7 +124,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     /// Renders list of 2d triangles.
     fn tri_list<F>(
         &mut self,
-        _draw_state: &DrawState,
+        draw_state: &DrawState,
         color: &[f32; 4],
         mut f: F
     )
@@ -148,17 +148,12 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                 &self.system.shader_color,
                 &uniform! { color: *color },
                 &DrawParameters {
-                    blend: Blend {
-                        color: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::SourceAlpha,
-                            destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                        },
-                        alpha: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::One,
-                            destination: LinearBlendingFactor::One,
-                        },
-                        constant_value: (0.0, 0.0, 0.0, 0.0)
-                    },
+                    blend: draw_state::convert_blend(draw_state.blend),
+                    color_mask:
+                        draw_state::convert_color_mask(draw_state.color_mask),
+                    scissor: draw_state::convert_scissor(draw_state.scissor),
+                    multisampling:
+                        draw_state::convert_multi_sample(draw_state.multi_sample),
                     .. Default::default()
                 },
             )
@@ -173,7 +168,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     /// The texture coordinates refers to the current texture.
     fn tri_list_uv<F>(
         &mut self,
-        _draw_state: &DrawState,
+        draw_state: &DrawState,
         color: &[f32; 4],
         texture: &DrawTexture,
         mut f: F
@@ -208,17 +203,12 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     s_texture: texture
                 },
                 &DrawParameters {
-                    blend: Blend {
-                        color: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::SourceAlpha,
-                            destination: LinearBlendingFactor::OneMinusSourceAlpha,
-                        },
-                        alpha: BlendingFunction::Addition {
-                            source: LinearBlendingFactor::One,
-                            destination: LinearBlendingFactor::One,
-                        },
-                        constant_value: (0.0, 0.0, 0.0, 0.0)
-                    },
+                    blend: draw_state::convert_blend(draw_state.blend),
+                    color_mask:
+                        draw_state::convert_color_mask(draw_state.color_mask),
+                    scissor: draw_state::convert_scissor(draw_state.scissor),
+                    multisampling:
+                        draw_state::convert_multi_sample(draw_state.multi_sample),
                     .. Default::default()
                 },
             )
