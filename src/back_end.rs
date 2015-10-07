@@ -142,6 +142,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
+            let (polygon_mode, line_width, point_size, cull) =
+                draw_state::convert_primitive(draw_state.primitive);
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
@@ -157,6 +159,10 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     stencil: draw_state::convert_stencil(draw_state.stencil,
                         &draw_state.primitive),
                     depth: draw_state::convert_depth(draw_state.depth),
+                    polygon_mode: polygon_mode,
+                    line_width: line_width,
+                    point_size: point_size,
+                    backface_culling: cull,
                     .. Default::default()
                 },
             )
@@ -197,6 +203,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             });
 
             let texture = &texture.texture;
+            let (polygon_mode, line_width, point_size, cull) =
+                draw_state::convert_primitive(draw_state.primitive);
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
@@ -215,6 +223,10 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     stencil: draw_state::convert_stencil(draw_state.stencil,
                         &draw_state.primitive),
                     depth: draw_state::convert_depth(draw_state.depth),
+                    polygon_mode: polygon_mode,
+                    line_width: line_width,
+                    point_size: point_size,
+                    backface_culling: cull,
                     .. Default::default()
                 },
             )

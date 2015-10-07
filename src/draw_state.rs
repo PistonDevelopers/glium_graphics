@@ -2,6 +2,33 @@ use glium;
 use graphics::draw_state;
 use graphics::draw_state::state::BlendChannel;
 
+/// Returns polygon_mode, line_width, point_size, backface_cullingmode
+pub fn convert_primitive(p: draw_state::state::Primitive)
+-> (glium::draw_parameters::PolygonMode, Option<f32>, Option<f32>,
+    glium::draw_parameters::BackfaceCullingMode) {
+    use graphics::draw_state::state::{ CullFace, FrontFace, RasterMethod };
+    use glium::draw_parameters::{ BackfaceCullingMode, PolygonMode };
+
+    let (front, back) = match p.front_face {
+            FrontFace::Clockwise =>
+                (BackfaceCullingMode::CullClockWise,
+                 BackfaceCullingMode::CullCounterClockWise),
+            FrontFace::CounterClockwise =>
+                (BackfaceCullingMode::CullCounterClockWise,
+                 BackfaceCullingMode::CullClockWise),
+        };
+    let cull = match p.get_cull_face() {
+            CullFace::Nothing => BackfaceCullingMode::CullingDisabled,
+            CullFace::Front => front,
+            CullFace::Back => back,
+    };
+    match p.method {
+        RasterMethod::Point => (PolygonMode::Point, None, Some(1.0), cull),
+        RasterMethod::Line(width) => (PolygonMode::Line, Some(width), None, cull),
+        RasterMethod::Fill(_) => (PolygonMode::Fill, None, None, cull),
+    }
+}
+
 pub fn convert_multi_sample(ms: Option<draw_state::state::MultiSample>)
 -> bool {
     match ms {
