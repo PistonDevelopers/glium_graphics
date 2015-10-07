@@ -156,6 +156,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                         draw_state::convert_multi_sample(draw_state.multi_sample),
                     stencil: draw_state::convert_stencil(draw_state.stencil,
                         &draw_state.primitive),
+                    depth: draw_state::convert_depth(draw_state.depth),
                     .. Default::default()
                 },
             )
@@ -213,6 +214,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                         draw_state::convert_multi_sample(draw_state.multi_sample),
                     stencil: draw_state::convert_stencil(draw_state.stencil,
                         &draw_state.primitive),
+                    depth: draw_state::convert_depth(draw_state.depth),
                     .. Default::default()
                 },
             )

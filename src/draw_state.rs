@@ -104,6 +104,30 @@ pub fn convert_stencil(
     }
 }
 
+pub fn convert_depth(depth: Option<draw_state::state::Depth>)
+-> glium::Depth {
+    use graphics::draw_state::state::Comparison;
+    use glium::DepthTest;
+
+    match depth {
+        None => Default::default(),
+        Some(depth) => glium::Depth {
+                test: match depth.fun {
+                    Comparison::Never => DepthTest::Ignore,
+                    Comparison::Less => DepthTest::IfLess,
+                    Comparison::LessEqual => DepthTest::IfLessOrEqual,
+                    Comparison::Equal => DepthTest::IfEqual,
+                    Comparison::GreaterEqual => DepthTest::IfMoreOrEqual,
+                    Comparison::Greater => DepthTest::IfMore,
+                    Comparison::NotEqual => DepthTest::IfNotEqual,
+                    Comparison::Always => DepthTest::Overwrite,
+                },
+                write: depth.write,
+                ..Default::default()
+            }
+    }
+}
+
 fn convert_factor(factor: draw_state::state::Factor)
 -> glium::LinearBlendingFactor {
     use graphics::draw_state::state::{ BlendValue, Factor };
