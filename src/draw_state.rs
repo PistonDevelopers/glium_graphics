@@ -30,11 +30,11 @@ pub fn convert_primitive(p: draw_state::state::Primitive)
 
     let (front, back) = match p.front_face {
             FrontFace::Clockwise =>
-                (BackfaceCullingMode::CullClockWise,
-                 BackfaceCullingMode::CullCounterClockWise),
+                (BackfaceCullingMode::CullClockwise,
+                 BackfaceCullingMode::CullCounterClockwise),
             FrontFace::CounterClockwise =>
-                (BackfaceCullingMode::CullCounterClockWise,
-                 BackfaceCullingMode::CullClockWise),
+                (BackfaceCullingMode::CullCounterClockwise,
+                 BackfaceCullingMode::CullClockwise),
         };
     let cull = match p.get_cull_face() {
             CullFace::Nothing => BackfaceCullingMode::CullingDisabled,
