@@ -1,6 +1,6 @@
 use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
-    Surface, Texture2d, Texture, Program, VertexBuffer,
+    Surface, Texture2d, Program, VertexBuffer,
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;

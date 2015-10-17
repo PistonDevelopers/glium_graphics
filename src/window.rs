@@ -19,7 +19,7 @@ impl GliumWindow {
         where W: OpenGLWindow + 'static
     {
         unsafe {
-            Context::new(Wrapper(window.clone()), true)
+            Context::new(Wrapper(window.clone()), true, Default::default())
         }.map(GliumWindow)
     }
 
