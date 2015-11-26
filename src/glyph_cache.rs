@@ -4,6 +4,7 @@ use graphics::character::{ CharacterCache, Character };
 use graphics::types::FontSize;
 use glium::Texture2d;
 use glium::backend::Facade;
+use glium::texture::RawImage2d;
 use image::{ Rgba, ImageBuffer };
 use freetype::{ self, Face };
 use ::back_end::DrawTexture;
@@ -19,16 +20,21 @@ fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
     let bitmap_glyph = glyph.to_bitmap(freetype::render_mode::RenderMode::Normal, None).unwrap();
     let bitmap = bitmap_glyph.bitmap();
     let texture =
-        if bitmap.width() != 0 { Texture2d::new(
-            facade,
-            ImageBuffer::<Rgba<u8>, _>::from_raw(
+        if bitmap.width() != 0 {
+            let image = ImageBuffer::<Rgba<u8>, _>::from_raw(
                 bitmap.width() as u32, bitmap.rows() as u32,
                 bitmap.buffer().iter()
                     .flat_map(|&pix| vec![255, 255, 255, pix].into_iter())
                     .collect::<Vec<_>>()
-            ).expect("failed to create glyph texture")
-        ) }
-        else { Texture2d::empty(facade, 1, 1) };
+                ).expect("failed to create glyph texture");
+            let image_dimensions = image.dimensions();
+            Texture2d::new(
+                facade,
+                RawImage2d::from_raw_rgba_reversed(
+                    image.into_raw(), image_dimensions
+                )
+            )
+        } else { Texture2d::empty(facade, 1, 1) };
     let glyph_size_x = glyph.advance_x();
     let glyph_size_y = glyph.advance_y();
     Character {
