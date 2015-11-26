@@ -9,6 +9,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::path::Path;
 use glium::{ Surface, Texture2d };
+use glium::texture::RawImage2d;
 use glium_graphics::{ Glium2d, GliumGraphics, DrawTexture, GliumWindow };
 use piston::event_loop::*;
 use piston::input::RenderEvent;
@@ -24,8 +25,11 @@ fn main() {
     ));
     let ref glium_window = GliumWindow::new(window).unwrap();
     let rust_logo = DrawTexture::new({
-        let image = image::open(&Path::new("assets/rust.png")).unwrap();
-        Texture2d::new(glium_window, image).unwrap()
+        let image = image::open(&Path::new("assets/rust.png"))
+            .unwrap().to_rgba();
+        let image_dimensions = image.dimensions();
+        Texture2d::new(glium_window,
+            RawImage2d::from_raw_rgba_reversed(image.into_raw(), image_dimensions)).unwrap()
     });
 
     let mut g2d = Glium2d::new(opengl, glium_window);
