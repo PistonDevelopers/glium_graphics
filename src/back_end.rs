@@ -2,10 +2,12 @@ use graphics::{ self, DrawState, ImageSize, Graphics };
 use glium::{
     Surface, Texture2d, Program, VertexBuffer,
 };
+use glium::texture::{ TextureCreationError, RawImage2d };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
 use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
+use texture::{ Rgba8Texture, TextureSettings };
 
 use draw_state;
 
@@ -29,6 +31,34 @@ impl ImageSize for DrawTexture {
     }
 }
 
+impl<F> Rgba8Texture<F> for DrawTexture
+    where F: Facade
+{
+    type Error = TextureCreationError;
+
+    fn create<S: Into<[u32; 2]>>(
+        factory: &mut F,
+        memory: &[u8],
+        size: S,
+        settings: &TextureSettings
+    ) -> Result<Self, Self::Error> {
+        let size = size.into();
+        Ok(DrawTexture {
+            texture: try!(Texture2d::new(factory,
+                RawImage2d::from_raw_rgba_reversed(memory.to_owned(),
+                    (size[0], size[1]))))
+        })
+    }
+
+    fn update<S: Into<[u32; 2]>>(
+        &mut self,
+        factory: &mut F,
+        memory: &[u8],
+        size: S
+    ) -> Result<(), Self::Error> {
+        unimplemented!()
+    }
+}
 
 #[derive(Copy, Clone)]
 struct PlainVertex {

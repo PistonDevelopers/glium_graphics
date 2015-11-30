@@ -39,7 +39,7 @@ fn main() {
         use graphics::*;
 
         let mut target = glium_window.draw();
-        
+
         {
             let mut g = GliumGraphics::new(&mut g2d, &mut target);
 
