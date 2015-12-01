@@ -7,10 +7,10 @@ extern crate glutin_window;
 
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::path::Path;
-use glium::{ Surface, Texture2d };
-use glium::texture::RawImage2d;
-use glium_graphics::{ Glium2d, GliumGraphics, Texture, GliumWindow };
+use glium::Surface;
+use glium_graphics::{
+    Flip, Glium2d, GliumGraphics, GliumWindow, Texture, TextureSettings
+};
 use piston::event_loop::*;
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
@@ -23,14 +23,9 @@ fn main() {
         WindowSettings::new("glium_graphics: image_test", [w, h])
         .exit_on_esc(true).build().unwrap()
     ));
-    let ref glium_window = GliumWindow::new(window).unwrap();
-    let rust_logo = Texture::new({
-        let image = image::open(&Path::new("assets/rust.png"))
-            .unwrap().to_rgba();
-        let image_dimensions = image.dimensions();
-        Texture2d::new(glium_window,
-            RawImage2d::from_raw_rgba_reversed(image.into_raw(), image_dimensions)).unwrap()
-    });
+    let ref mut glium_window = GliumWindow::new(window).unwrap();
+    let rust_logo = Texture::from_path(glium_window, "assets/rust.png",
+        Flip::None, &TextureSettings::new()).unwrap();
 
     let mut g2d = Glium2d::new(opengl, glium_window);
     let transform = graphics::math::abs_transform(w as f64, h as f64);

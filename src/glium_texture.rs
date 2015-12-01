@@ -115,7 +115,7 @@ impl<F> Rgba8Texture<F> for Texture
         factory: &mut F,
         memory: &[u8],
         size: S,
-        settings: &TextureSettings
+        _settings: &TextureSettings
     ) -> Result<Self, Self::Error> {
         let size = size.into();
         Ok(Texture(try!(Texture2d::new(factory,
@@ -123,6 +123,7 @@ impl<F> Rgba8Texture<F> for Texture
                     (size[0], size[1]))))))
     }
 
+    #[allow(unused_variables)]
     fn update<S: Into<[u32; 2]>>(
         &mut self,
         factory: &mut F,
