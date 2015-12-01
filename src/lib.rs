@@ -14,7 +14,7 @@ extern crate texture;
 pub use window::GliumWindow;
 
 pub use glyph_cache::GlyphCache;
-pub use back_end::{ Glium2d, GliumGraphics, DrawTexture };
+pub use back_end::{ Flip, Glium2d, GliumGraphics, Texture };
 pub use texture::*;
 
 mod glyph_cache;
