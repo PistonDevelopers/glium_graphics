@@ -16,15 +16,12 @@ pub enum Flip {
 }
 
 /// Wrapper for 2D texture.
-pub struct Texture {
-    /// The Glium texture.
-    pub texture: Texture2d,
-}
+pub struct Texture(pub Texture2d);
 
 impl Texture {
     /// Creates a new `Texture`.
     pub fn new(texture: Texture2d) -> Texture {
-        Texture { texture: texture }
+        Texture(texture)
     }
 
     /// Returns empty texture.
@@ -104,7 +101,7 @@ impl Texture {
 
 impl ImageSize for Texture {
     fn get_size(&self) -> (u32, u32) {
-        let ref tex = self.texture;
+        let ref tex = self.0;
         (tex.get_width(), tex.get_height().unwrap())
     }
 }
@@ -121,11 +118,9 @@ impl<F> Rgba8Texture<F> for Texture
         settings: &TextureSettings
     ) -> Result<Self, Self::Error> {
         let size = size.into();
-        Ok(Texture {
-            texture: try!(Texture2d::new(factory,
+        Ok(Texture(try!(Texture2d::new(factory,
                 RawImage2d::from_raw_rgba_reversed(memory.to_owned(),
-                    (size[0], size[1]))))
-        })
+                    (size[0], size[1]))))))
     }
 
     fn update<S: Into<[u32; 2]>>(

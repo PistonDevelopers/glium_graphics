@@ -164,7 +164,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
-            let texture = &texture.texture;
+            let ref texture = texture.0;
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
