@@ -7,12 +7,12 @@ use glium::backend::Facade;
 use glium::texture::RawImage2d;
 use image::{ Rgba, ImageBuffer };
 use freetype::{ self, Face };
-use ::back_end::DrawTexture;
+use Texture;
 
 
 fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
                              character: char)
-    -> Character<DrawTexture>
+    -> Character<Texture>
 {
     face.set_pixel_sizes(0, font_size).unwrap();
     face.load_char(character as usize, freetype::face::DEFAULT).unwrap();
@@ -46,14 +46,14 @@ fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,
             (glyph_size_x >> 16) as f64,
             (glyph_size_y >> 16) as f64
         ],
-        texture: DrawTexture::new(texture.unwrap()),
+        texture: Texture::new(texture.unwrap()),
     }
 }
 
 /// Caches characters for a font.
 pub struct GlyphCache<F> {
     face: Face<'static>,
-    data: HashMap<FontSize, HashMap<char, Character<DrawTexture>>>,
+    data: HashMap<FontSize, HashMap<char, Character<Texture>>>,
     facade: F,
 }
 
@@ -71,10 +71,10 @@ impl<F> GlyphCache<F> {
 }
 
 impl<F: Facade> CharacterCache for GlyphCache<F> {
-    type Texture = DrawTexture;
+    type Texture = Texture;
 
     fn character<'a>(&'a mut self, font_size: FontSize, character: char)
-        -> &'a Character<DrawTexture>
+        -> &'a Character<Texture>
     {
         use std::collections::hash_map::Entry::{Vacant, Occupied};
         let size_cache: &'a mut HashMap<char, _> = match self.data.entry(font_size) {

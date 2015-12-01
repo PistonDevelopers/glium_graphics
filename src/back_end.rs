@@ -1,34 +1,14 @@
-use graphics::{ self, DrawState, ImageSize, Graphics };
+use graphics::{ self, DrawState, Graphics };
 use glium::{
-    Surface, Texture2d, Program, VertexBuffer,
+    Surface, Program, VertexBuffer,
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
 use shader_version::{ Shaders, OpenGL };
 use shader_version::glsl::GLSL;
+use Texture;
 
 use draw_state;
-
-/// Wrapper for 2D texture.
-pub struct DrawTexture {
-    /// The Glium texture.
-    pub texture: Texture2d,
-}
-
-impl DrawTexture {
-    /// Creates a new `DrawTexture`.
-    pub fn new(texture: Texture2d) -> DrawTexture {
-        DrawTexture { texture: texture }
-    }
-}
-
-impl ImageSize for DrawTexture {
-    fn get_size(&self) -> (u32, u32) {
-        let ref tex = self.texture;
-        (tex.get_width(), tex.get_height().unwrap())
-    }
-}
-
 
 #[derive(Copy, Clone)]
 struct PlainVertex {
@@ -107,7 +87,7 @@ impl<'d, 's, S> GliumGraphics<'d, 's, S> {
 
 /// Implemented by all graphics back-ends.
 impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
-    type Texture = DrawTexture;
+    type Texture = Texture;
 
     /// Clears background with a color.
     fn clear_color(&mut self, color: [f32; 4]) {
@@ -161,7 +141,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         &mut self,
         draw_state: &DrawState,
         color: &[f32; 4],
-        texture: &DrawTexture,
+        texture: &Texture,
         mut f: F
     )
         where F: FnMut(&mut FnMut(&[f32], &[f32]))
@@ -184,7 +164,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
-            let texture = &texture.texture;
+            let ref texture = texture.0;
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
