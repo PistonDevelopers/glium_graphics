@@ -7,7 +7,7 @@ use glium::backend::Facade;
 use glium::texture::RawImage2d;
 use image::{ Rgba, ImageBuffer };
 use freetype::{ self, Face };
-use ::back_end::Texture;
+use Texture;
 
 
 fn load_character<F: Facade>(face: &Face, facade: &F, font_size: FontSize,

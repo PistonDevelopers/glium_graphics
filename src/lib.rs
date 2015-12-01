@@ -14,10 +14,12 @@ extern crate texture;
 pub use window::GliumWindow;
 
 pub use glyph_cache::GlyphCache;
-pub use back_end::{ Flip, Glium2d, GliumGraphics, Texture };
+pub use back_end::{ Glium2d, GliumGraphics };
 pub use texture::*;
+pub use glium_texture::{ Flip, Texture };
 
 mod glyph_cache;
 mod back_end;
 mod window;
 mod draw_state;
+mod glium_texture;
