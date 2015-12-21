@@ -2,9 +2,10 @@ extern crate window;
 
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::os::raw::c_void;
 use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame, SwapBuffersError };
-use self::window::{ OpenGLWindow, ProcAddress };
+use self::window::OpenGLWindow;
 
 #[derive(Clone)]
 struct Wrapper<W>(Rc<RefCell<W>>);
@@ -41,8 +42,8 @@ unsafe impl<W> Backend for Wrapper<W> where W: OpenGLWindow {
         Ok(())
     }
 
-    unsafe fn get_proc_address(&self, proc_name: &str) -> ProcAddress {
-        self.0.borrow_mut().get_proc_address(proc_name)
+    unsafe fn get_proc_address(&self, proc_name: &str) -> *const c_void {
+        self.0.borrow_mut().get_proc_address(proc_name) as *const c_void
     }
 
     fn get_framebuffer_dimensions(&self) -> (u32, u32) {
