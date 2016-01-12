@@ -36,7 +36,9 @@ fn main() {
 
     let mut g2d = Glium2d::new(opengl, glium_window);
 
-    for e in window.events().swap_buffers(false) {
+    let mut events = window.borrow().events().swap_buffers(false);
+    // Temporary fix for https://github.com/rust-lang/rust/issues/30832.
+    while let Some(e) = { let mut b = window.borrow_mut(); events.next(&mut *b) } {
         if let Some(args) = e.render_args() {
             use graphics::*;
 
