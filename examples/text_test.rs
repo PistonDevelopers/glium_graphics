@@ -28,25 +28,27 @@ fn main() {
 
     let mut g2d = Glium2d::new(opengl, glium_window);
 
-    for _ in window.events().swap_buffers(false)
-        .filter_map(|event| event.render_args())
-    {    
-        let mut target = glium_window.draw();
-        {
-            use graphics::*;
-            let mut g = GliumGraphics::new(&mut g2d, &mut target);
-            let transform =
-                graphics::math::abs_transform(size.width as f64, size.height as f64)
-                .trans(10.0, 100.0);
-            clear([1.0; 4], &mut g);
-            text::Text::new_color([0.0, 0.5, 0.0, 1.0], 32).draw(
-                "Hello glium_graphics!",
-                &mut glyph_cache,
-                &default_draw_state(),
-                transform,
-                &mut g
-            );
+    let mut events = window.borrow().events().swap_buffers(false);
+    // Temporary fix for https://github.com/rust-lang/rust/issues/30832.
+    while let Some(e) = { let mut b = window.borrow_mut(); events.next(&mut *b) } {
+        if let Some(_) = e.render_args() {
+            let mut target = glium_window.draw();
+            {
+                use graphics::*;
+                let mut g = GliumGraphics::new(&mut g2d, &mut target);
+                let transform =
+                    graphics::math::abs_transform(size.width as f64, size.height as f64)
+                    .trans(10.0, 100.0);
+                clear([1.0; 4], &mut g);
+                text::Text::new_color([0.0, 0.5, 0.0, 1.0], 32).draw(
+                    "Hello glium_graphics!",
+                    &mut glyph_cache,
+                    &default_draw_state(),
+                    transform,
+                    &mut g
+                );
+            }
+            target.finish().unwrap();
         }
-        target.finish().unwrap();
     }
 }
