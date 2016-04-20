@@ -43,7 +43,7 @@ fn main() {
                 text::Text::new_color([0.0, 0.5, 0.0, 1.0], 32).draw(
                     "Hello glium_graphics!",
                     &mut glyph_cache,
-                    &default_draw_state(),
+                    &draw_state::DrawState::default(),
                     transform,
                     &mut g
                 );

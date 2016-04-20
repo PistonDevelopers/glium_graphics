@@ -1,10 +1,11 @@
 use std::path::Path;
 
+use graphics::ImageSize;
 use glium::{ Texture2d };
 use glium::texture::{ RawImage2d, TextureCreationError };
 use glium::backend::Facade;
 use image::{ self, DynamicImage, RgbaImage };
-use texture::{ self, ImageSize, TextureSettings, Rgba8Texture };
+use texture::{ self, TextureSettings, Rgba8Texture };
 
 /// Flip settings.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -100,6 +101,13 @@ impl Texture {
 }
 
 impl ImageSize for Texture {
+    fn get_size(&self) -> (u32, u32) {
+        let ref tex = self.0;
+        (tex.get_width(), tex.get_height().unwrap())
+    }
+}
+
+impl texture::ImageSize for Texture {
     fn get_size(&self) -> (u32, u32) {
         let ref tex = self.0;
         (tex.get_width(), tex.get_height().unwrap())
