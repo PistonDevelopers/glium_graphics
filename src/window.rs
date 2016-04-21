@@ -1,4 +1,5 @@
 extern crate piston;
+extern crate glutin_window;
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -9,6 +10,7 @@ use glium::{ GliumCreationError, Frame, SwapBuffersError };
 use self::piston::event_loop::{ EventLoop, WindowEvents };
 use self::piston::window::{ BuildFromWindowSettings, OpenGLWindow, Window, WindowSettings };
 use self::piston::input::{ Event, GenericEvent };
+use self::glutin_window::GlutinWindow;
 
 use Glium2d;
 use GliumGraphics;
@@ -17,7 +19,7 @@ use GliumGraphics;
 struct Wrapper<W>(Rc<RefCell<W>>);
 
 /// A window struct for glium.
-pub struct GliumWindow<W> {
+pub struct GliumWindow<W = GlutinWindow> {
     /// Window.
     pub window: Rc<RefCell<W>>,
     /// Glium context.

@@ -1,19 +1,17 @@
 extern crate piston;
 extern crate graphics;
-extern crate glutin_window;
 extern crate glium_graphics;
 
 use std::path::Path;
 use piston::window::{ WindowSettings, Size };
 use piston::input::RenderEvent;
-use glium_graphics::{ Glium2d, GliumWindow, GlyphCache };
-use glutin_window::{ GlutinWindow, OpenGL };
+use glium_graphics::{ Glium2d, GliumWindow, GlyphCache, OpenGL };
 use graphics::*;
 
 fn main() {
     let opengl = OpenGL::V3_2;
     let size = Size { width: 500, height: 300 };
-    let ref mut window: GliumWindow<GlutinWindow> =
+    let ref mut window: GliumWindow =
         WindowSettings::new("gfx_graphics: text_test", size)
         .exit_on_esc(true).opengl(opengl).build().unwrap();
 

@@ -2,15 +2,13 @@ extern crate graphics;
 extern crate glium;
 extern crate glium_graphics;
 extern crate piston;
-extern crate glutin_window;
 
 use glium::Surface;
 use glium_graphics::{
-    Flip, Glium2d, GliumWindow, Texture, TextureSettings
+    Flip, Glium2d, GliumWindow, OpenGL, Texture, TextureSettings
 };
 use piston::input::*;
 use piston::window::WindowSettings;
-use glutin_window::{ GlutinWindow, OpenGL };
 use graphics::draw_state::Blend;
 use graphics::*;
 
@@ -20,7 +18,7 @@ fn main() {
 
     let opengl = OpenGL::V3_2;
     let (w, h) = (640, 480);
-    let ref mut window: GliumWindow<GlutinWindow> =
+    let ref mut window: GliumWindow =
         WindowSettings::new("glium_graphics: image_test", [w, h])
         .exit_on_esc(true).opengl(opengl).build().unwrap();
 
