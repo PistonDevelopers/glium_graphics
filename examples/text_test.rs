@@ -6,7 +6,7 @@ extern crate glium_graphics;
 use std::path::Path;
 use piston::window::{ WindowSettings, Size };
 use piston::input::RenderEvent;
-use glium_graphics::{ GliumGraphics, Glium2d, GliumWindow, GlyphCache };
+use glium_graphics::{ Glium2d, GliumWindow, GlyphCache };
 use glutin_window::{ GlutinWindow, OpenGL };
 use graphics::*;
 
@@ -24,23 +24,20 @@ fn main() {
 
     let mut g2d = Glium2d::new(opengl, window);
     while let Some(e) = window.next() {
-        if let Some(_) = e.render_args() {
+        if let Some(args) = e.render_args() {
             let mut target = window.draw();
-            {
+            window.draw_2d(&mut target, &mut g2d, args.viewport(), |c, g| {
                 use graphics::*;
-                let mut g = GliumGraphics::new(&mut g2d, &mut target);
-                let transform =
-                    graphics::math::abs_transform(size.width as f64, size.height as f64)
-                    .trans(10.0, 100.0);
-                clear([1.0; 4], &mut g);
+
+                clear([1.0; 4], g);
                 text::Text::new_color([0.0, 0.5, 0.0, 1.0], 32).draw(
                     "Hello glium_graphics!",
                     &mut glyph_cache,
                     &DrawState::default(),
-                    transform,
-                    &mut g
+                    c.transform.trans(10.0, 100.0),
+                    g
                 );
-            }
+            });
             target.finish().unwrap();
         }
     }

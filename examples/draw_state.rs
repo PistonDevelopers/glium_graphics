@@ -6,7 +6,7 @@ extern crate glutin_window;
 
 use glium::Surface;
 use glium_graphics::{
-    Flip, Glium2d, GliumGraphics, GliumWindow, Texture, TextureSettings
+    Flip, Glium2d, GliumWindow, Texture, TextureSettings
 };
 use piston::input::*;
 use piston::window::WindowSettings;
@@ -35,10 +35,7 @@ fn main() {
             use graphics::*;
 
             let mut target = window.draw();
-            {
-                let ref mut g = GliumGraphics::new(&mut g2d, &mut target);
-                let c = Context::new_viewport(args.viewport());
-
+            window.draw_2d(&mut target, &mut g2d, args.viewport(), |c, g| {
                 clear([0.8, 0.8, 0.8, 1.0], g);
                 g.clear_stencil(0);
                 Rectangle::new([1.0, 0.0, 0.0, 1.0])
@@ -63,7 +60,7 @@ fn main() {
                     &(if clip_inside { DrawState::new_inside() }
                         else { DrawState::new_outside() }),
                     transform, g);
-            }
+            });
 
             target.finish().unwrap();
         }

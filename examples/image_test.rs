@@ -7,7 +7,7 @@ extern crate glutin_window;
 
 use glium::Surface;
 use glium_graphics::{
-    Flip, Glium2d, GliumGraphics, GliumWindow, Texture, TextureSettings
+    Flip, Glium2d, GliumWindow, Texture, TextureSettings
 };
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
@@ -24,26 +24,21 @@ fn main() {
         Flip::None, &TextureSettings::new()).unwrap();
 
     let mut g2d = Glium2d::new(opengl, window);
-    let transform = graphics::math::abs_transform(w as f64, h as f64);
     while let Some(e) = window.next() {
         use graphics::*;
 
-        if let Some(_) = e.render_args() {
+        if let Some(args) = e.render_args() {
             let mut target = window.draw();
-            {
-                let mut g = GliumGraphics::new(&mut g2d, &mut target);
-
-                clear(color::WHITE, &mut g);
+            window.draw_2d(&mut target, &mut g2d, args.viewport(), |c, g| {
+                clear(color::WHITE, g);
                 rectangle([1.0, 0.0, 0.0, 1.0],
                           [0.0, 0.0, 100.0, 100.0],
-                          transform,
-                          &mut g);
+                          c.transform, g);
                 rectangle([0.0, 1.0, 0.0, 0.3],
                           [50.0, 50.0, 100.0, 100.0],
-                          transform,
-                          &mut g);
-                image(&rust_logo, transform.trans(100.0, 100.0), &mut g);
-            }
+                          c.transform, g);
+                image(&rust_logo, c.transform.trans(100.0, 100.0), g);
+            });
             target.finish().unwrap();
         }
 

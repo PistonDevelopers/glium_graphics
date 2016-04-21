@@ -3,11 +3,15 @@ extern crate piston;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::os::raw::c_void;
+use graphics::{ self, Viewport };
 use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame, SwapBuffersError };
 use self::piston::event_loop::{ EventLoop, WindowEvents };
 use self::piston::window::{ BuildFromWindowSettings, OpenGLWindow, Window, WindowSettings };
 use self::piston::input::{ Event, GenericEvent };
+
+use Glium2d;
+use GliumGraphics;
 
 #[derive(Clone)]
 struct Wrapper<W>(Rc<RefCell<W>>);
@@ -67,6 +71,17 @@ impl<W> GliumWindow<W>
     /// Returns new frame.
     pub fn draw(&self) -> Frame {
         Frame::new(self.context.clone(), self.context.get_framebuffer_dimensions())
+    }
+
+    /// Renders 2D graphics.
+    pub fn draw_2d<F>(&mut self, target: &mut Frame, g2d: &mut Glium2d, viewport: Viewport, f: F) where
+        F: FnOnce(graphics::Context, &mut GliumGraphics<Frame>)
+    {
+        use graphics::Context;
+
+        let ref mut g = GliumGraphics::new(g2d, target);
+        let c = Context::new_viewport(viewport);
+        f(c, g);
     }
 
     /// Returns next event.
