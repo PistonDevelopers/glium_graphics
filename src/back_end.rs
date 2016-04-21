@@ -1,4 +1,5 @@
 use graphics::{ self, DrawState, Graphics };
+use graphics::color::gamma_srgb_to_linear;
 use glium::{
     Surface, Program, VertexBuffer,
 };
@@ -91,6 +92,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
 
     /// Clears background with a color.
     fn clear_color(&mut self, color: [f32; 4]) {
+        let color = gamma_srgb_to_linear(color);
         let (r, g, b, a) = (color[0], color[1], color[2], color[3]);
         self.surface.clear_color(r, g, b, a);
     }
@@ -109,6 +111,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     )
         where F: FnMut(&mut FnMut(&[f32]))
     {
+        let color = gamma_srgb_to_linear(*color);
         f(&mut |vertices: &[f32]| {
             self.system.plain_buffer.invalidate();
             let slice = self.system.plain_buffer.slice(0..vertices.len() / 2).unwrap();
@@ -125,7 +128,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
                 &self.system.shader_color,
-                &uniform! { color: *color },
+                &uniform! { color: color },
                 &draw_state::convert_draw_state(draw_state),
             )
             .ok()
@@ -148,6 +151,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     {
         use std::cmp::min;
 
+        let color = gamma_srgb_to_linear(*color);
         f(&mut |vertices: &[f32], texture_coords: &[f32]| {
             let len = min(vertices.len(), texture_coords.len()) / 2;
 
@@ -170,7 +174,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                 &NoIndices(PrimitiveType::TrianglesList),
                 &self.system.shader_texture,
                 &uniform! {
-                    color: *color,
+                    color: color,
                     s_texture: texture
                 },
                 &draw_state::convert_draw_state(draw_state),

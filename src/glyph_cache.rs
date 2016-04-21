@@ -2,7 +2,7 @@ use std::path::Path;
 use std::collections::HashMap;
 use graphics::character::{ CharacterCache, Character };
 use graphics::types::{ FontSize, Scalar };
-use glium::Texture2d;
+use glium::texture::srgb_texture2d::SrgbTexture2d;
 use glium::backend::Facade;
 use glium::texture::RawImage2d;
 use image::{ Rgba, ImageBuffer };
@@ -53,13 +53,13 @@ impl<F> GlyphCache<F> where F: Facade {
                             .collect::<Vec<_>>()
                         ).expect("failed to create glyph texture");
                     let image_dimensions = image.dimensions();
-                    Texture2d::new(
+                    SrgbTexture2d::new(
                         facade,
                         RawImage2d::from_raw_rgba_reversed(
                             image.into_raw(), image_dimensions
                         )
                     )
-                } else { Texture2d::empty(facade, 1, 1) };
+                } else { SrgbTexture2d::empty(facade, 1, 1) };
             let glyph_size_x = glyph.advance_x();
             let glyph_size_y = glyph.advance_y();
             (
