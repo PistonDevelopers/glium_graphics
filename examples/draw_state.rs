@@ -33,7 +33,7 @@ fn main() {
             use graphics::*;
 
             let mut target = window.draw();
-            window.draw_2d(&mut target, &mut g2d, args.viewport(), |c, g| {
+            g2d.draw(&mut target, args.viewport(), |c, g| {
                 clear([0.8, 0.8, 0.8, 1.0], g);
                 g.clear_stencil(0);
                 Rectangle::new([1.0, 0.0, 0.0, 1.0])

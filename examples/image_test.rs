@@ -27,7 +27,7 @@ fn main() {
 
         if let Some(args) = e.render_args() {
             let mut target = window.draw();
-            window.draw_2d(&mut target, &mut g2d, args.viewport(), |c, g| {
+            g2d.draw(&mut target, args.viewport(), |c, g| {
                 clear(color::WHITE, g);
                 rectangle([1.0, 0.0, 0.0, 1.0],
                           [0.0, 0.0, 100.0, 100.0],

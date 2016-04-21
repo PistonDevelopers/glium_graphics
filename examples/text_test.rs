@@ -24,7 +24,7 @@ fn main() {
     while let Some(e) = window.next() {
         if let Some(args) = e.render_args() {
             let mut target = window.draw();
-            window.draw_2d(&mut target, &mut g2d, args.viewport(), |c, g| {
+            g2d.draw(&mut target, args.viewport(), |c, g| {
                 use graphics::*;
 
                 clear([1.0; 4], g);
