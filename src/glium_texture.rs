@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use graphics::ImageSize;
-use glium::{ Texture2d };
+use glium::texture::srgb_texture2d::{ SrgbTexture2d };
 use glium::texture::{ RawImage2d, TextureCreationError };
 use glium::backend::Facade;
 use image::{ self, DynamicImage, RgbaImage };
@@ -17,11 +17,11 @@ pub enum Flip {
 }
 
 /// Wrapper for 2D texture.
-pub struct Texture(pub Texture2d);
+pub struct Texture(pub SrgbTexture2d);
 
 impl Texture {
     /// Creates a new `Texture`.
-    pub fn new(texture: Texture2d) -> Texture {
+    pub fn new(texture: SrgbTexture2d) -> Texture {
         Texture(texture)
     }
 
@@ -120,7 +120,7 @@ impl<F> CreateTexture<F> for Texture
         _settings: &TextureSettings
     ) -> Result<Self, Self::Error> {
         let size = size.into();
-        Ok(Texture(try!(Texture2d::new(factory,
+        Ok(Texture(try!(SrgbTexture2d::new(factory,
                 RawImage2d::from_raw_rgba_reversed(memory.to_owned(),
                     (size[0], size[1]))))))
     }
