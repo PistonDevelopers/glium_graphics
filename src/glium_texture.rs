@@ -1,10 +1,11 @@
 use std::path::Path;
 
+use graphics::ImageSize;
 use glium::{ Texture2d };
 use glium::texture::{ RawImage2d, TextureCreationError };
 use glium::backend::Facade;
 use image::{ self, DynamicImage, RgbaImage };
-use texture::{ self, ImageSize, TextureSettings, Rgba8Texture };
+use texture::{ self, TextureSettings, CreateTexture, UpdateTexture, Format };
 
 /// Flip settings.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -28,7 +29,7 @@ impl Texture {
     pub fn empty<F>(factory: &mut F) -> Result<Self, TextureCreationError>
         where F: Facade
     {
-        Rgba8Texture::create(factory, &[0u8; 4], [1, 1], &TextureSettings::new())
+        CreateTexture::create(factory, Format::Rgba8, &[0u8; 4], [1, 1], &TextureSettings::new())
     }
 
     /// Creates a texture from path.
@@ -67,7 +68,7 @@ impl Texture {
         where F: Facade
     {
         let (width, height) = img.dimensions();
-        Rgba8Texture::create(factory, img, [width, height], settings)
+        CreateTexture::create(factory, Format::Rgba8, img, [width, height], settings)
     }
 
     /// Creates texture from memory alpha.
@@ -86,7 +87,7 @@ impl Texture {
 
         let size = [width, height];
         let buffer = texture::ops::alpha_to_rgba8(buffer, size);
-        Rgba8Texture::create(factory, &buffer, size, settings)
+        CreateTexture::create(factory, Format::Rgba8, &buffer, size, settings)
     }
 
     /// Updates texture with an image.
@@ -95,7 +96,7 @@ impl Texture {
         where F: Facade
     {
         let (width, height) = img.dimensions();
-        Rgba8Texture::update(self, factory, img, [width, height])
+        UpdateTexture::update(self, factory, Format::Rgba8, img, [width, height])
     }
 }
 
@@ -106,13 +107,14 @@ impl ImageSize for Texture {
     }
 }
 
-impl<F> Rgba8Texture<F> for Texture
+impl<F> CreateTexture<F> for Texture
     where F: Facade
 {
     type Error = TextureCreationError;
 
     fn create<S: Into<[u32; 2]>>(
         factory: &mut F,
+        _format: Format,
         memory: &[u8],
         size: S,
         _settings: &TextureSettings
@@ -122,11 +124,18 @@ impl<F> Rgba8Texture<F> for Texture
                 RawImage2d::from_raw_rgba_reversed(memory.to_owned(),
                     (size[0], size[1]))))))
     }
+}
+
+impl<F> UpdateTexture<F> for Texture
+    where F: Facade
+{
+    type Error = TextureCreationError;
 
     #[allow(unused_variables)]
     fn update<S: Into<[u32; 2]>>(
         &mut self,
         factory: &mut F,
+        _format: Format,
         memory: &[u8],
         size: S
     ) -> Result<(), Self::Error> {
