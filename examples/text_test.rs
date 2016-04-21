@@ -3,11 +3,8 @@ extern crate graphics;
 extern crate glutin_window;
 extern crate glium_graphics;
 
-use std::cell::RefCell;
-use std::rc::Rc;
 use std::path::Path;
 use piston::window::{ WindowSettings, Size };
-use piston::event_loop::*;
 use piston::input::RenderEvent;
 use glium_graphics::{ GliumGraphics, Glium2d, GliumWindow, GlyphCache };
 use glutin_window::{ GlutinWindow, OpenGL };
@@ -16,24 +13,19 @@ use graphics::*;
 fn main() {
     let opengl = OpenGL::V3_2;
     let size = Size { width: 500, height: 300 };
-    let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
+    let ref mut window: GliumWindow<GlutinWindow> =
         WindowSettings::new("gfx_graphics: text_test", size)
-        .exit_on_esc(true).opengl(opengl).build().unwrap()
-    ));
+        .exit_on_esc(true).opengl(opengl).build().unwrap();
 
-    let ref glium_window = GliumWindow::new(window).unwrap();
     let mut glyph_cache = GlyphCache::new(
         Path::new("assets/FiraSans-Regular.ttf"),
-        glium_window.clone()
+        window.clone()
     ).unwrap();
 
-    let mut g2d = Glium2d::new(opengl, glium_window);
-
-    let mut events = window.borrow().events().swap_buffers(false);
-    // Temporary fix for https://github.com/rust-lang/rust/issues/30832.
-    while let Some(e) = { let mut b = window.borrow_mut(); events.next(&mut *b) } {
+    let mut g2d = Glium2d::new(opengl, window);
+    while let Some(e) = window.next() {
         if let Some(_) = e.render_args() {
-            let mut target = glium_window.draw();
+            let mut target = window.draw();
             {
                 use graphics::*;
                 let mut g = GliumGraphics::new(&mut g2d, &mut target);

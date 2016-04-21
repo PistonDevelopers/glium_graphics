@@ -4,13 +4,10 @@ extern crate glium_graphics;
 extern crate piston;
 extern crate glutin_window;
 
-use std::rc::Rc;
-use std::cell::RefCell;
 use glium::Surface;
 use glium_graphics::{
     Flip, Glium2d, GliumGraphics, GliumWindow, Texture, TextureSettings
 };
-use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use glutin_window::{ GlutinWindow, OpenGL };
@@ -23,26 +20,21 @@ fn main() {
 
     let opengl = OpenGL::V3_2;
     let (w, h) = (640, 480);
-    let ref window: Rc<RefCell<GlutinWindow>> = Rc::new(RefCell::new(
+    let ref mut window: GliumWindow<GlutinWindow> =
         WindowSettings::new("glium_graphics: image_test", [w, h])
-        .exit_on_esc(true).build().unwrap()
-    ));
-    let ref mut glium_window = GliumWindow::new(window).unwrap();
+        .exit_on_esc(true).opengl(opengl).build().unwrap();
 
     let mut blend = Blend::Alpha;
     let mut clip_inside = true;
-    let rust_logo = Texture::from_path(glium_window, "assets/rust.png",
+    let rust_logo = Texture::from_path(window, "assets/rust.png",
         Flip::None, &TextureSettings::new()).unwrap();
 
-    let mut g2d = Glium2d::new(opengl, glium_window);
-
-    let mut events = window.borrow().events().swap_buffers(false);
-    // Temporary fix for https://github.com/rust-lang/rust/issues/30832.
-    while let Some(e) = { let mut b = window.borrow_mut(); events.next(&mut *b) } {
+    let mut g2d = Glium2d::new(opengl, window);
+    while let Some(e) = window.next() {
         if let Some(args) = e.render_args() {
             use graphics::*;
 
-            let mut target = glium_window.draw();
+            let mut target = window.draw();
             {
                 let ref mut g = GliumGraphics::new(&mut g2d, &mut target);
                 let c = Context::new_viewport(args.viewport());
