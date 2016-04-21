@@ -1,7 +1,6 @@
 extern crate graphics;
 extern crate glium;
 extern crate glium_graphics;
-extern crate image;
 extern crate piston;
 extern crate glutin_window;
 
@@ -16,6 +15,7 @@ use piston::input::*;
 use piston::window::WindowSettings;
 use glutin_window::{ GlutinWindow, OpenGL };
 use graphics::draw_state::Blend;
+use graphics::*;
 
 fn main() {
     println!("Press A to change blending");
@@ -66,10 +66,10 @@ fn main() {
 
                 let transform = c.transform.trans(200.0, 200.0);
                 Ellipse::new([1.0, 0.0, 0.0, 1.0])
-                    .draw([0.0, 0.0, 50.0, 50.0], &draw_state::DrawState::new_clip(), transform, g);
+                    .draw([0.0, 0.0, 50.0, 50.0], &DrawState::new_clip(), transform, g);
                 Image::new().draw(&rust_logo,
-                    &(if clip_inside { draw_state::DrawState::new_inside() }
-                        else { draw_state::DrawState::new_outside() }),
+                    &(if clip_inside { DrawState::new_inside() }
+                        else { DrawState::new_outside() }),
                     transform, g);
             }
 

@@ -11,6 +11,7 @@ use piston::event_loop::*;
 use piston::input::RenderEvent;
 use glium_graphics::{ GliumGraphics, Glium2d, GliumWindow, GlyphCache };
 use glutin_window::{ GlutinWindow, OpenGL };
+use graphics::*;
 
 fn main() {
     let opengl = OpenGL::V3_2;
@@ -43,7 +44,7 @@ fn main() {
                 text::Text::new_color([0.0, 0.5, 0.0, 1.0], 32).draw(
                     "Hello glium_graphics!",
                     &mut glyph_cache,
-                    &draw_state::DrawState::default(),
+                    &DrawState::default(),
                     transform,
                     &mut g
                 );
