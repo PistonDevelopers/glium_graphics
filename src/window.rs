@@ -7,7 +7,9 @@ use std::os::raw::c_void;
 use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame, SwapBuffersError };
 use self::piston::event_loop::{ EventLoop, WindowEvents };
-use self::piston::window::{ BuildFromWindowSettings, OpenGLWindow, Window, WindowSettings };
+use self::piston::window::{
+    AdvancedWindow, BuildFromWindowSettings, OpenGLWindow, Size, Window, WindowSettings
+};
 use self::piston::input::{ Event, GenericEvent };
 use self::glutin_window::GlutinWindow;
 
@@ -104,5 +106,56 @@ unsafe impl<W> Backend for Wrapper<W> where W: OpenGLWindow {
 
     unsafe fn make_current(&self) {
         self.0.borrow_mut().make_current()
+    }
+}
+
+impl<W> Window for GliumWindow<W>
+    where W: Window
+{
+    type Event = <W as Window>::Event;
+
+    fn should_close(&self) -> bool { self.window.borrow().should_close() }
+    fn set_should_close(&mut self, value: bool) {
+        self.window.borrow_mut().set_should_close(value)
+    }
+    fn size(&self) -> Size { self.window.borrow().size() }
+    fn draw_size(&self) -> Size { self.window.borrow().draw_size() }
+    fn swap_buffers(&mut self) { self.window.borrow_mut().swap_buffers() }
+    fn poll_event(&mut self) -> Option<Self::Event> {
+        Window::poll_event(&mut *self.window.borrow_mut())
+    }
+}
+
+impl<W> AdvancedWindow for GliumWindow<W>
+    where W: AdvancedWindow
+{
+    fn get_title(&self) -> String { self.window.borrow().get_title() }
+    fn set_title(&mut self, title: String) {
+        self.window.borrow_mut().set_title(title)
+    }
+    fn get_exit_on_esc(&self) -> bool { self.window.borrow().get_exit_on_esc() }
+    fn set_exit_on_esc(&mut self, value: bool) {
+        self.window.borrow_mut().set_exit_on_esc(value)
+    }
+    fn set_capture_cursor(&mut self, value: bool) {
+        self.window.borrow_mut().set_capture_cursor(value)
+    }
+}
+
+impl<W> EventLoop for GliumWindow<W> {
+    fn set_ups(&mut self, frames: u64) {
+        self.events.set_ups(frames);
+    }
+
+    fn set_max_fps(&mut self, frames: u64) {
+        self.events.set_max_fps(frames);
+    }
+
+    fn set_swap_buffers(&mut self, enable: bool) {
+        self.events.set_swap_buffers(enable);
+    }
+
+    fn set_bench_mode(&mut self, enable: bool) {
+        self.events.set_bench_mode(enable);
     }
 }
