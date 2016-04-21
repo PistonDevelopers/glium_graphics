@@ -93,6 +93,8 @@ pub fn convert_blend(blend: Option<draw_state::Blend>) -> glium::Blend {
         None => Default::default(),
         Some(blend) => {
             match blend {
+                // What we need is different from glium::Blend::alpha_blending(),
+                // so we have to construct this manually.
                 Blend::Alpha => {
                     glium::Blend {
                         color: BlendingFunction::Addition {
