@@ -11,6 +11,8 @@ extern crate shader_version;
 extern crate shaders_graphics2d as shaders;
 extern crate texture;
 
+pub use shader_version::OpenGL;
+
 pub use window::GliumWindow;
 
 pub use glyph_cache::GlyphCache;

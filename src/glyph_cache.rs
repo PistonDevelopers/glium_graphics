@@ -18,9 +18,11 @@ pub struct GlyphCache<F> {
 
 impl<F> GlyphCache<F> where F: Facade {
      /// Constructor for a GlyphCache.
-    pub fn new(font: &Path, facade: F) -> Result<Self, freetype::error::Error> {
+    pub fn new<P>(font: P, facade: F) -> Result<Self, freetype::error::Error>
+        where P: AsRef<Path>
+    {
         let freetype = try!(freetype::Library::init());
-        let face = try!(freetype.new_face(font, 0));
+        let face = try!(freetype.new_face(font.as_ref(), 0));
         Ok(GlyphCache {
             face: face,
             data: HashMap::new(),

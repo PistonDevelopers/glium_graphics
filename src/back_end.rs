@@ -1,7 +1,7 @@
-use graphics::{ self, DrawState, Graphics };
+use graphics::{ self, DrawState, Graphics, Viewport };
 use graphics::color::gamma_srgb_to_linear;
 use glium::{
-    Surface, Program, VertexBuffer,
+    Frame, Surface, Program, VertexBuffer,
 };
 use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
@@ -65,6 +65,17 @@ impl Glium2d {
                                                    .get(glsl).unwrap(),
                                      None).ok().expect("failed to initialize colored shader"),
         }
+    }
+
+    /// Renders 2D graphics.
+    pub fn draw<F>(&mut self, target: &mut Frame, viewport: Viewport, f: F) where
+        F: FnOnce(graphics::Context, &mut GliumGraphics<Frame>)
+    {
+        use graphics::Context;
+
+        let ref mut g = GliumGraphics::new(self, target);
+        let c = Context::new_viewport(viewport);
+        f(c, g);
     }
 }
 
