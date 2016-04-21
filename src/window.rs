@@ -4,6 +4,7 @@ extern crate glutin_window;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::os::raw::c_void;
+use std::ops::Deref;
 use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame, SwapBuffersError };
 use self::piston::event_loop::{ EventLoop, WindowEvents };
@@ -24,6 +25,14 @@ pub struct GliumWindow<W = GlutinWindow> {
     pub context: Rc<Context>,
     /// Event loop state.
     pub events: WindowEvents
+}
+
+impl<W> Deref for GliumWindow<W> {
+    type Target = Context;
+
+    fn deref(&self) -> &Context {
+        &self.context
+    }
 }
 
 impl<W> Clone for GliumWindow<W> {
