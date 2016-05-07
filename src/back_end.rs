@@ -68,14 +68,14 @@ impl Glium2d {
     }
 
     /// Renders 2D graphics.
-    pub fn draw<F>(&mut self, target: &mut Frame, viewport: Viewport, f: F) where
-        F: FnOnce(graphics::Context, &mut GliumGraphics<Frame>)
+    pub fn draw<F, U>(&mut self, target: &mut Frame, viewport: Viewport, f: F) -> U where
+        F: FnOnce(graphics::Context, &mut GliumGraphics<Frame>) -> U
     {
         use graphics::Context;
 
         let ref mut g = GliumGraphics::new(self, target);
         let c = Context::new_viewport(viewport);
-        f(c, g);
+        f(c, g)
     }
 }
 
