@@ -4,7 +4,6 @@ extern crate glium_graphics;
 extern crate image;
 extern crate piston;
 
-use glium::Surface;
 use glium_graphics::{
     Flip, Glium2d, GliumWindow, OpenGL, Texture, TextureSettings
 };

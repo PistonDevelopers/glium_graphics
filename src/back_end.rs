@@ -11,12 +11,15 @@ use Texture;
 
 use draw_state;
 
+const CHUNKS: usize = 100;
+
 #[derive(Copy, Clone)]
 struct PlainVertex {
+    color: [f32; 4],
     pos: [f32; 2],
 }
 
-implement_vertex!(PlainVertex, pos);
+implement_vertex!(PlainVertex, color, pos);
 
 
 #[derive(Copy, Clone)]
@@ -29,6 +32,10 @@ implement_vertex!(TexturedVertex, pos, uv);
 
 /// The resources needed for rendering 2D.
 pub struct Glium2d {
+    // The offset in vertices for colored rendering.
+    colored_offset: usize,
+    // The current draw state for colored rendering.
+    colored_draw_state: DrawState,
     plain_buffer: VertexBuffer<PlainVertex>,
     textured_buffer: VertexBuffer<TexturedVertex>,
     shader_texture: Program,
@@ -43,27 +50,32 @@ impl Glium2d {
         let src = |bytes| { unsafe { ::std::str::from_utf8_unchecked(bytes) } };
         let glsl = opengl.to_glsl();
 
+        let plain_buffer = VertexBuffer::empty_dynamic(window,
+            CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT).unwrap();
         Glium2d {
-            plain_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT).unwrap(),
-            textured_buffer: VertexBuffer::empty_dynamic(window, graphics::BACK_END_MAX_VERTEX_COUNT).unwrap(),
+            colored_offset: 0,
+            colored_draw_state: Default::default(),
+            plain_buffer: plain_buffer,
+            textured_buffer: VertexBuffer::empty_dynamic(window,
+                graphics::BACK_END_MAX_VERTEX_COUNT).unwrap(),
             shader_texture:
                 Program::from_source(window,
-                                     Shaders::new().set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
-                                                   .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE))
-                                                   .get(glsl).unwrap(),
-                                     Shaders::new().set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
-                                                   .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE))
-                                                   .get(glsl).unwrap(),
-                                     None).ok().expect("failed to initialize textured shader"),
+                    Shaders::new().set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
+                        .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE))
+                        .get(glsl).unwrap(),
+                    Shaders::new().set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
+                        .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE))
+                        .get(glsl).unwrap(),
+                    None).ok().expect("failed to initialize textured shader"),
             shader_color:
                 Program::from_source(window,
-                                     Shaders::new().set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
-                                                   .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE))
-                                                   .get(glsl).unwrap(),
-                                     Shaders::new().set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
-                                                   .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE))
-                                                   .get(glsl).unwrap(),
-                                     None).ok().expect("failed to initialize colored shader"),
+                    Shaders::new().set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
+                        .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE))
+                        .get(glsl).unwrap(),
+                    Shaders::new().set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
+                        .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE))
+                        .get(glsl).unwrap(),
+                    None).ok().expect("failed to initialize colored shader"),
         }
     }
 
@@ -75,7 +87,11 @@ impl Glium2d {
 
         let ref mut g = GliumGraphics::new(self, target);
         let c = Context::new_viewport(viewport);
-        f(c, g)
+        let res = f(c, g);
+        if g.system.colored_offset > 0 {
+            g.flush_colored();
+        }
+        res
     }
 }
 
@@ -86,7 +102,7 @@ pub struct GliumGraphics<'d, 's, S: 's> {
     surface: &'s mut S,
 }
 
-impl<'d, 's, S> GliumGraphics<'d, 's, S> {
+impl<'d, 's, S: Surface> GliumGraphics<'d, 's, S> {
     /// Creates a new graphics object.
     pub fn new(system: &'d mut Glium2d, surface: &'s mut S)
                -> GliumGraphics<'d, 's, S> {
@@ -94,6 +110,24 @@ impl<'d, 's, S> GliumGraphics<'d, 's, S> {
             system: system,
             surface: surface,
         }
+    }
+
+    fn flush_colored(&mut self) {
+        let slice = self.system.plain_buffer
+            .slice(0..self.system.colored_offset).unwrap();
+
+        self.surface.draw(
+            slice,
+            &NoIndices(PrimitiveType::TrianglesList),
+            &self.system.shader_color,
+            &uniform! {},
+            &draw_state::convert_draw_state(&self.system.colored_draw_state),
+        )
+        .ok()
+        .expect("failed to draw triangle list");
+
+        self.system.colored_offset = 0;
+        self.system.plain_buffer.invalidate();
     }
 }
 
@@ -123,27 +157,27 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         where F: FnMut(&mut FnMut(&[f32]))
     {
         let color = gamma_srgb_to_linear(*color);
+        // Flush when draw state changes.
+        if &self.system.colored_draw_state != draw_state {
+            self.flush_colored();
+            self.system.colored_draw_state = *draw_state;
+        }
         f(&mut |vertices: &[f32]| {
-            self.system.plain_buffer.invalidate();
-            let slice = self.system.plain_buffer.slice(0..vertices.len() / 2).unwrap();
-
+            let n = vertices.len() / 2;
+            if self.system.colored_offset + n > CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT {
+                self.flush_colored();
+            }
+            let slice = self.system.plain_buffer
+                .slice(self.system.colored_offset..self.system.colored_offset + n).unwrap();
             slice.write({
-                &(0 .. vertices.len() / 2)
+                &(0 .. n)
                     .map(|i| PlainVertex {
+                        color: color,
                         pos: [vertices[2 * i], vertices[2 * i + 1]]
                     })
                     .collect::<Vec<_>>()
             });
-
-            self.surface.draw(
-                slice,
-                &NoIndices(PrimitiveType::TrianglesList),
-                &self.system.shader_color,
-                &uniform! { color: color },
-                &draw_state::convert_draw_state(draw_state),
-            )
-            .ok()
-            .expect("failed to draw triangle list");
+            self.system.colored_offset += n;
         })
     }
 
@@ -163,6 +197,9 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         use std::cmp::min;
 
         let color = gamma_srgb_to_linear(*color);
+        if self.system.colored_offset > 0 {
+            self.flush_colored();
+        }
         f(&mut |vertices: &[f32], texture_coords: &[f32]| {
             let len = min(vertices.len(), texture_coords.len()) / 2;
 

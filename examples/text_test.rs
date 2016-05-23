@@ -6,7 +6,6 @@ use std::path::Path;
 use piston::window::{ WindowSettings, Size };
 use piston::input::RenderEvent;
 use glium_graphics::{ Glium2d, GliumWindow, GlyphCache, OpenGL };
-use graphics::*;
 
 fn main() {
     let opengl = OpenGL::V3_2;
