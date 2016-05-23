@@ -3,14 +3,12 @@ extern crate glium;
 extern crate glium_graphics;
 extern crate piston;
 
-use glium::Surface;
 use glium_graphics::{
     Flip, Glium2d, GliumWindow, OpenGL, Texture, TextureSettings
 };
 use piston::input::*;
 use piston::window::WindowSettings;
 use graphics::draw_state::Blend;
-use graphics::*;
 
 fn main() {
     println!("Press A to change blending");
