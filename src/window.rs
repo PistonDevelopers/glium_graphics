@@ -9,7 +9,13 @@ use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame, SwapBuffersError };
 use self::piston::event_loop::{ EventLoop, WindowEvents };
 use self::piston::window::{
-    AdvancedWindow, BuildFromWindowSettings, OpenGLWindow, Size, Window, WindowSettings
+    AdvancedWindow,
+    BuildFromWindowSettings,
+    OpenGLWindow,
+    Position,
+    Size,
+    Window,
+    WindowSettings
 };
 use self::piston::input::{ Event, GenericEvent };
 use self::glutin_window::GlutinWindow;
@@ -49,10 +55,9 @@ impl<W> BuildFromWindowSettings for GliumWindow<W>
     where W: 'static + Window + OpenGLWindow + BuildFromWindowSettings,
           W::Event: GenericEvent
 {
-    fn build_from_window_settings(mut settings: WindowSettings)
-    -> Result<GliumWindow<W>, String> {
+    fn build_from_window_settings(settings: &WindowSettings) -> Result<GliumWindow<W>, String> {
         // Turn on sRGB.
-        settings = settings.srgb(true);
+        let settings = settings.clone().srgb(true);
         GliumWindow::new(&Rc::new(RefCell::new(try!(settings.build()))))
             .map_err(|err| match err {
                 GliumCreationError::BackendCreationError(..) =>
@@ -148,6 +153,14 @@ impl<W> AdvancedWindow for GliumWindow<W>
     }
     fn set_capture_cursor(&mut self, value: bool) {
         self.window.borrow_mut().set_capture_cursor(value)
+    }
+    fn show(&mut self) { self.window.borrow_mut().show() }
+    fn hide(&mut self) { self.window.borrow_mut().show() }
+    fn get_position(&self) -> Option<Position> {
+        self.window.borrow().get_position()
+    }
+    fn set_position<P: Into<Position>>(&mut self, pos: P) {
+        self.window.borrow_mut().set_position(pos);
     }
 }
 
