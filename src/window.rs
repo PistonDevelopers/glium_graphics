@@ -110,7 +110,7 @@ unsafe impl<W> Backend for Wrapper<W> where W: OpenGLWindow {
     }
 
     fn get_framebuffer_dimensions(&self) -> (u32, u32) {
-        let size = self.0.borrow().size();
+        let size = self.0.borrow().draw_size();
         (size.width, size.height)
     }
 
