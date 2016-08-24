@@ -1,6 +1,6 @@
 [package]
 name = "piston2d-glium_graphics"
-version = "0.27.0"
+version = "0.28.0"
 authors = [
     "Eduard Bopp <eduard.bopp@aepsil0n.de>",
     "bvssvni <bvssvni@gmail.com>"
@@ -21,11 +21,11 @@ version = "0.15.0"
 default_features = false
 
 [dependencies]
-freetype-rs = "0.10.0"
+freetype-rs = "0.11.0"
 image = "0.10.0"
 piston-shaders_graphics2d = "0.2.1"
-piston2d-graphics = "0.16.0"
-piston-texture = "0.4.0"
-piston = "0.24.0"
+piston2d-graphics = "0.17.0"
+piston-texture = "0.5.0"
+piston = "0.25.0"
 shader_version = "0.2.0"
-pistoncore-glutin_window = "0.28.0"
+pistoncore-glutin_window = "0.29.0"
