@@ -96,7 +96,7 @@ impl Texture {
         where F: Facade
     {
         let (width, height) = img.dimensions();
-        UpdateTexture::update(self, factory, Format::Rgba8, img, [width, height])
+        UpdateTexture::update(self, factory, Format::Rgba8, img, [0, 0], [width, height])
     }
 }
 
@@ -132,11 +132,12 @@ impl<F> UpdateTexture<F> for Texture
     type Error = TextureCreationError;
 
     #[allow(unused_variables)]
-    fn update<S: Into<[u32; 2]>>(
+    fn update<O: Into<[u32; 2]>, S: Into<[u32; 2]>>(
         &mut self,
         factory: &mut F,
         _format: Format,
         memory: &[u8],
+        offset: O,
         size: S
     ) -> Result<(), Self::Error> {
         unimplemented!()
