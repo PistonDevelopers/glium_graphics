@@ -3,6 +3,7 @@ extern crate glutin_window;
 
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::time::Duration;
 use std::os::raw::c_void;
 use std::ops::Deref;
 use glium::backend::{ Backend, Context, Facade };
@@ -137,6 +138,13 @@ impl<W> Window for GliumWindow<W>
     fn swap_buffers(&mut self) { self.window.borrow_mut().swap_buffers() }
     fn poll_event(&mut self) -> Option<Self::Event> {
         Window::poll_event(&mut *self.window.borrow_mut())
+    }
+    fn wait_event(&mut self) -> Self::Event {
+        Window::wait_event(&mut *self.window.borrow_mut())
+    }
+    fn wait_event_timeout(&mut self, duration: Duration) -> Option<Self::Event> {
+        let mut window = self.window.borrow_mut();
+        Window::wait_event_timeout(&mut *window, duration)
     }
 }
 
