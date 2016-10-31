@@ -21,7 +21,7 @@ version = "0.15.0"
 default_features = false
 
 [dependencies]
-freetype-rs = "0.11.0"
+rusttype = "0.2.1"
 image = "0.10.0"
 piston-shaders_graphics2d = "0.2.1"
 piston2d-graphics = "0.18.0"
