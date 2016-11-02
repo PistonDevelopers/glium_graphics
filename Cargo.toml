@@ -1,6 +1,6 @@
 [package]
 name = "piston2d-glium_graphics"
-version = "0.31.0"
+version = "0.32.0"
 authors = [
     "Eduard Bopp <eduard.bopp@aepsil0n.de>",
     "bvssvni <bvssvni@gmail.com>"
