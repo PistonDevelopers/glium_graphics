@@ -195,6 +195,10 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         where F: FnMut(&mut FnMut(&[f32], &[f32]))
     {
         use std::cmp::min;
+        use glium::uniforms::{Sampler, SamplerWrapFunction};
+
+        let sampler = Sampler::new(&texture.0)
+            .wrap_function(SamplerWrapFunction::Clamp);
 
         let color = gamma_srgb_to_linear(*color);
         if self.system.colored_offset > 0 {
@@ -216,14 +220,13 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
-            let ref texture = texture.0;
             self.surface.draw(
                 slice,
                 &NoIndices(PrimitiveType::TrianglesList),
                 &self.system.shader_texture,
                 &uniform! {
                     color: color,
-                    s_texture: texture
+                    s_texture: sampler
                 },
                 &draw_state::convert_draw_state(draw_state),
             )
