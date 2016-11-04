@@ -100,20 +100,21 @@ impl<F: Facade> CharacterCache for GlyphCache<F> {
                         min: Point{x: 0, y: 0},
                         max: Point{x: 0, y: 0}
                     });
-                let pixel_bb_width = pixel_bounding_box.width();
-                let pixel_bb_height = pixel_bounding_box.height();
+                // Add one-pixel margin to fix sampling.
+                let pixel_bb_width = pixel_bounding_box.width() + 2;
+                let pixel_bb_height = pixel_bounding_box.height() + 2;
 
                 let mut image_buffer = Vec::<u8>::new();
                 image_buffer.resize((pixel_bb_width * pixel_bb_height) as usize, 0);
                 glyph.draw(|x, y, v| {
-                   let pos = (x + y * (pixel_bb_width as u32)) as usize;
+                   let pos = ((x+1) + (y+1) * (pixel_bb_width as u32)) as usize;
                    image_buffer[pos] = (255.0 * v) as u8;
                 });
 
                 let &mut (offset, size, ref texture) = v.insert((
                     [
-                        bounding_box.min.x as Scalar,
-                        -pixel_bounding_box.min.y as Scalar,
+                        bounding_box.min.x as Scalar + 1.0,
+                        -pixel_bounding_box.min.y as Scalar + 1.0,
                     ],
                     [
                         h_metrics.advance_width as Scalar,
