@@ -33,6 +33,15 @@ pub struct GlyphCache<F> {
 }
 
 impl<F> GlyphCache<F> where F: Facade {
+    /// Constructs a GlyphCache from a Font.
+    pub fn from_font(font: Font<'static>, facade: F) -> Self {
+        GlyphCache {
+            font: font,
+            data: HashMap::new(),
+            facade: facade,
+        }
+    }
+
      /// Constructor for a GlyphCache.
     pub fn new<P>(font_path: P, facade: F) -> Result<Self, Error>
         where P: AsRef<Path>
@@ -50,11 +59,7 @@ impl<F> GlyphCache<F> where F: Facade {
             None => return Err(Error::NoFont),
         };
 
-        Ok(GlyphCache {
-            font: font,
-            data: HashMap::new(),
-            facade: facade,
-        })
+        Ok(Self::from_font(font, facade))
     }
 }
 
