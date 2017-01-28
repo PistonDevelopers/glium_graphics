@@ -7,6 +7,7 @@ use glium_graphics::{
     Flip, Glium2d, GliumWindow, OpenGL, Texture, TextureSettings
 };
 use piston::input::*;
+use piston::event_loop::EventLoop;
 use piston::window::WindowSettings;
 use graphics::draw_state::Blend;
 
@@ -26,6 +27,7 @@ fn main() {
         Flip::None, &TextureSettings::new()).unwrap();
 
     let mut g2d = Glium2d::new(opengl, window);
+    window.set_lazy(true);
     while let Some(e) = window.next() {
         if let Some(args) = e.render_args() {
             use graphics::*;

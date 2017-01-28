@@ -5,6 +5,7 @@ extern crate glium_graphics;
 use std::path::Path;
 use piston::window::{ WindowSettings, Size };
 use piston::input::RenderEvent;
+use piston::event_loop::EventLoop;
 use glium_graphics::{ Glium2d, GliumWindow, GlyphCache, OpenGL };
 
 fn main() {
@@ -20,6 +21,7 @@ fn main() {
     ).unwrap();
 
     let mut g2d = Glium2d::new(opengl, window);
+    window.set_lazy(true);
     while let Some(e) = window.next() {
         if let Some(args) = e.render_args() {
             let mut target = window.draw();

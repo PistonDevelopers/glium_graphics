@@ -8,7 +8,7 @@ use std::os::raw::c_void;
 use std::ops::Deref;
 use glium::backend::{ Backend, Context, Facade };
 use glium::{ GliumCreationError, Frame, SwapBuffersError };
-use self::piston::event_loop::{ EventLoop, WindowEvents };
+use self::piston::event_loop::{ EventLoop, EventSettings, Events };
 use self::piston::window::{
     AdvancedWindow,
     BuildFromWindowSettings,
@@ -18,7 +18,7 @@ use self::piston::window::{
     Window,
     WindowSettings
 };
-use self::piston::input::{ Event, GenericEvent };
+use self::piston::input::Input;
 use self::glutin_window::GlutinWindow;
 
 #[derive(Clone)]
@@ -31,7 +31,7 @@ pub struct GliumWindow<W = GlutinWindow> {
     /// Glium context.
     pub context: Rc<Context>,
     /// Event loop state.
-    pub events: WindowEvents
+    pub events: Events
 }
 
 impl<W> Deref for GliumWindow<W> {
@@ -53,8 +53,7 @@ impl<W> Clone for GliumWindow<W> {
 }
 
 impl<W> BuildFromWindowSettings for GliumWindow<W>
-    where W: 'static + Window + OpenGLWindow + BuildFromWindowSettings,
-          W::Event: GenericEvent
+    where W: 'static + Window + OpenGLWindow + BuildFromWindowSettings
 {
     fn build_from_window_settings(settings: &WindowSettings) -> Result<GliumWindow<W>, String> {
         // Turn on sRGB.
@@ -79,7 +78,7 @@ impl<W> GliumWindow<W>
         }.map(|context| GliumWindow {
             window: window.clone(),
             context: context,
-            events: WindowEvents::new().swap_buffers(false)
+            events: Events::new(EventSettings::new()).swap_buffers(false)
         })
     }
 
@@ -89,7 +88,7 @@ impl<W> GliumWindow<W>
     }
 
     /// Returns next event.
-    pub fn next(&mut self) -> Option<Event<<W as Window>::Event>> {
+    pub fn next(&mut self) -> Option<Input> {
         self.events.next(&mut *self.window.borrow_mut())
     }
 }
@@ -127,8 +126,6 @@ unsafe impl<W> Backend for Wrapper<W> where W: OpenGLWindow {
 impl<W> Window for GliumWindow<W>
     where W: Window
 {
-    type Event = <W as Window>::Event;
-
     fn should_close(&self) -> bool { self.window.borrow().should_close() }
     fn set_should_close(&mut self, value: bool) {
         self.window.borrow_mut().set_should_close(value)
@@ -136,13 +133,13 @@ impl<W> Window for GliumWindow<W>
     fn size(&self) -> Size { self.window.borrow().size() }
     fn draw_size(&self) -> Size { self.window.borrow().draw_size() }
     fn swap_buffers(&mut self) { self.window.borrow_mut().swap_buffers() }
-    fn poll_event(&mut self) -> Option<Self::Event> {
+    fn poll_event(&mut self) -> Option<Input> {
         Window::poll_event(&mut *self.window.borrow_mut())
     }
-    fn wait_event(&mut self) -> Self::Event {
+    fn wait_event(&mut self) -> Input {
         Window::wait_event(&mut *self.window.borrow_mut())
     }
-    fn wait_event_timeout(&mut self, duration: Duration) -> Option<Self::Event> {
+    fn wait_event_timeout(&mut self, duration: Duration) -> Option<Input> {
         let mut window = self.window.borrow_mut();
         Window::wait_event_timeout(&mut *window, duration)
     }
@@ -173,19 +170,11 @@ impl<W> AdvancedWindow for GliumWindow<W>
 }
 
 impl<W> EventLoop for GliumWindow<W> {
-    fn set_ups(&mut self, frames: u64) {
-        self.events.set_ups(frames);
+    fn get_event_settings(&self) -> EventSettings {
+        self.events.get_event_settings()
     }
 
-    fn set_max_fps(&mut self, frames: u64) {
-        self.events.set_max_fps(frames);
-    }
-
-    fn set_swap_buffers(&mut self, enable: bool) {
-        self.events.set_swap_buffers(enable);
-    }
-
-    fn set_bench_mode(&mut self, enable: bool) {
-        self.events.set_bench_mode(enable);
+    fn set_event_settings(&mut self, settings: EventSettings) {
+        self.events.set_event_settings(settings);
     }
 }
