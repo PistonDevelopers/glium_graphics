@@ -154,7 +154,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         color: &[f32; 4],
         mut f: F
     )
-        where F: FnMut(&mut FnMut(&[f32]))
+        where F: FnMut(&mut FnMut(&[[f32; 2]]))
     {
         let color = gamma_srgb_to_linear(*color);
         // Flush when draw state changes.
@@ -162,8 +162,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             self.flush_colored();
             self.system.colored_draw_state = *draw_state;
         }
-        f(&mut |vertices: &[f32]| {
-            let n = vertices.len() / 2;
+        f(&mut |vertices: &[[f32; 2]]| {
+            let n = vertices.len();
             if self.system.colored_offset + n > CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT {
                 self.flush_colored();
             }
@@ -173,7 +173,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                 &(0 .. n)
                     .map(|i| PlainVertex {
                         color: color,
-                        pos: [vertices[2 * i], vertices[2 * i + 1]]
+                        pos: vertices[i],
                     })
                     .collect::<Vec<_>>()
             });
@@ -192,7 +192,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         texture: &Texture,
         mut f: F
     )
-        where F: FnMut(&mut FnMut(&[f32], &[f32]))
+        where F: FnMut(&mut FnMut(&[[f32; 2]], &[[f32; 2]]))
     {
         use std::cmp::min;
         use glium::uniforms::{Sampler, SamplerWrapFunction};
@@ -204,8 +204,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         if self.system.colored_offset > 0 {
             self.flush_colored();
         }
-        f(&mut |vertices: &[f32], texture_coords: &[f32]| {
-            let len = min(vertices.len(), texture_coords.len()) / 2;
+        f(&mut |vertices: &[[f32; 2]], texture_coords: &[[f32; 2]]| {
+            let len = min(vertices.len(), texture_coords.len());
 
             self.system.textured_buffer.invalidate();
             let slice = self.system.textured_buffer.slice(0..len).unwrap();
@@ -213,9 +213,9 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             slice.write({
                 &(0 .. len)
                     .map(|i| TexturedVertex {
-                        pos: [vertices[2 * i], vertices[2 * i + 1]],
+                        pos: vertices[i],
                         // FIXME: The `1.0 - ...` is because of a wrong convention
-                        uv: [texture_coords[2 * i], 1.0 - texture_coords[2 * i + 1]]
+                        uv: [texture_coords[i][0], 1.0 - texture_coords[i][1]],
                     })
                     .collect::<Vec<_>>()
             });
