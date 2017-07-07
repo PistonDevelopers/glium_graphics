@@ -6,7 +6,7 @@ use std::path::Path;
 use piston::window::{ WindowSettings, Size };
 use piston::input::RenderEvent;
 use piston::event_loop::EventLoop;
-use glium_graphics::{ Glium2d, GliumWindow, GlyphCache, OpenGL };
+use glium_graphics::{ Glium2d, GliumWindow, GlyphCache, OpenGL, TextureSettings };
 
 fn main() {
     let opengl = OpenGL::V3_2;
@@ -17,7 +17,8 @@ fn main() {
 
     let mut glyph_cache = GlyphCache::new(
         Path::new("assets/FiraSans-Regular.ttf"),
-        window.clone()
+        window.clone(),
+        TextureSettings::new()
     ).unwrap();
 
     let mut g2d = Glium2d::new(opengl, window);
