@@ -29,21 +29,23 @@ impl From<io::Error> for Error {
 pub struct GlyphCache<F> {
     font: Font<'static>,
     data: HashMap<(FontSize, char), ([Scalar; 2], [Scalar; 2], Texture)>,
+    settings: TextureSettings,
     facade: F,
 }
 
 impl<F> GlyphCache<F> where F: Facade {
     /// Constructs a GlyphCache from a Font.
-    pub fn from_font(font: Font<'static>, facade: F) -> Self {
+    pub fn from_font(font: Font<'static>, facade: F, settings: TextureSettings) -> Self {
         GlyphCache {
             font: font,
             data: HashMap::new(),
+            settings: settings,
             facade: facade,
         }
     }
 
      /// Constructor for a GlyphCache.
-    pub fn new<P>(font_path: P, facade: F) -> Result<Self, Error>
+    pub fn new<P>(font_path: P, facade: F, settings: TextureSettings) -> Result<Self, Error>
         where P: AsRef<Path>
     {
         use std::io::Read;
@@ -59,7 +61,7 @@ impl<F> GlyphCache<F> where F: Facade {
             None => return Err(Error::NoFont),
         };
 
-        Ok(Self::from_font(font, facade))
+        Ok(Self::from_font(font, facade, settings))
     }
 }
 
@@ -135,7 +137,7 @@ impl<F: Facade> CharacterCache for GlyphCache<F> {
                                 &image_buffer,
                                 pixel_bb_width as u32,
                                 pixel_bb_height as u32,
-                                &TextureSettings::new()
+                                &self.settings
                             ).unwrap()
                         }
                     },
