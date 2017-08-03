@@ -121,7 +121,7 @@ impl<F> CreateTexture<F> for Texture
     ) -> Result<Self, Self::Error> {
         let size = size.into();
         Ok(Texture(try!(SrgbTexture2d::new(factory,
-                RawImage2d::from_raw_rgba_reversed(memory.to_owned(),
+                RawImage2d::from_raw_rgba_reversed(memory,
                     (size[0], size[1]))))))
     }
 }
