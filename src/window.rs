@@ -7,7 +7,7 @@ use std::time::Duration;
 use std::os::raw::c_void;
 use std::ops::Deref;
 use glium::backend::{ Backend, Context, Facade };
-use glium::{ GliumCreationError, Frame, SwapBuffersError };
+use glium::{ Frame, IncompatibleOpenGl, SwapBuffersError };
 use self::piston::event_loop::{ EventLoop, EventSettings, Events };
 use self::piston::window::{
     AdvancedWindow,
@@ -59,12 +59,9 @@ impl<W> BuildFromWindowSettings for GliumWindow<W>
         // Turn on sRGB.
         let settings = settings.clone().srgb(true);
         GliumWindow::new(&Rc::new(RefCell::new(try!(settings.build()))))
-            .map_err(|err| match err {
-                GliumCreationError::BackendCreationError(..) =>
-                    "Error while creating the backend",
-                GliumCreationError::IncompatibleOpenGl(..) =>
-                    "The OpenGL implementation is too old to work with glium",
-            }.into())
+            .map_err(|err|
+                format!("The OpenGL implementation is too old to work with glium: {}", err.0)
+            )
     }
 }
 
@@ -72,7 +69,7 @@ impl<W> GliumWindow<W>
     where W: OpenGLWindow + 'static
 {
     /// Creates new GliumWindow.
-    pub fn new(window: &Rc<RefCell<W>>) -> Result<Self, GliumCreationError<()>> {
+    pub fn new(window: &Rc<RefCell<W>>) -> Result<Self, IncompatibleOpenGl> {
         unsafe {
             Context::new(Wrapper(window.clone()), true, Default::default())
         }.map(|context| GliumWindow {
