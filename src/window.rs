@@ -18,7 +18,7 @@ use self::piston::window::{
     Window,
     WindowSettings
 };
-use self::piston::input::Input;
+use self::piston::input::{Event, Input};
 use self::glutin_window::GlutinWindow;
 
 #[derive(Clone)]
@@ -85,7 +85,7 @@ impl<W> GliumWindow<W>
     }
 
     /// Returns next event.
-    pub fn next(&mut self) -> Option<Input> {
+    pub fn next(&mut self) -> Option<Event> {
         self.events.next(&mut *self.window.borrow_mut())
     }
 }
