@@ -1,5 +1,4 @@
 extern crate graphics;
-extern crate glium;
 extern crate glium_graphics;
 extern crate piston;
 
