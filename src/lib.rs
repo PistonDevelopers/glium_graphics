@@ -12,6 +12,7 @@ extern crate texture;
 
 pub use shader_version::OpenGL;
 
+#[cfg(feature = "glium_window")]
 pub use window::GliumWindow;
 
 /// Stores textures for text rendering.
@@ -22,6 +23,7 @@ pub use texture::*;
 pub use glium_texture::{ Flip, Texture };
 
 mod back_end;
+#[cfg(feature = "glium_window")]
 mod window;
 mod draw_state;
 mod glium_texture;
