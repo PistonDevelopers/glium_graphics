@@ -1,10 +1,15 @@
+#[cfg(feature = "image")]
+extern crate image;
+
+#[cfg(feature = "image")]
 use std::path::Path;
 
 use graphics::ImageSize;
 use glium::texture::srgb_texture2d::{ SrgbTexture2d };
 use glium::texture::{ RawImage2d, TextureCreationError };
 use glium::backend::Facade;
-use image::{ self, DynamicImage, RgbaImage };
+#[cfg(feature = "image")]
+use self::image::{ DynamicImage, RgbaImage };
 use texture::{ self, TextureSettings, CreateTexture, UpdateTexture, Format };
 
 /// Flip settings.
@@ -33,6 +38,7 @@ impl Texture {
     }
 
     /// Creates a texture from path.
+    #[cfg(feature = "image")]
     pub fn from_path<F, P>(
         factory: &mut F,
         path: P,
@@ -60,6 +66,7 @@ impl Texture {
     }
 
     /// Creates a texture from image.
+    #[cfg(feature = "image")]
     pub fn from_image<F>(
         factory: &mut F,
         img: &RgbaImage,
@@ -91,6 +98,7 @@ impl Texture {
     }
 
     /// Updates texture with an image.
+    #[cfg(feature = "image")]
     pub fn update<F>(&mut self, factory: &mut F, img: &RgbaImage)
     -> Result<(), TextureCreationError>
         where F: Facade

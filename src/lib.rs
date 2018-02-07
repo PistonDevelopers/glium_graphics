@@ -5,7 +5,6 @@
 #[macro_use(uniform, implement_vertex)]
 extern crate glium;
 extern crate graphics;
-extern crate image;
 extern crate shader_version;
 extern crate shaders_graphics2d as shaders;
 extern crate texture;
