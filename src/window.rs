@@ -164,6 +164,9 @@ impl<W> AdvancedWindow for GliumWindow<W>
     fn set_position<P: Into<Position>>(&mut self, pos: P) {
         self.window.borrow_mut().set_position(pos);
     }
+    fn set_size<S: Into<Size>>(&mut self, size: S) {
+        self.window.borrow_mut().set_size(size)
+    }
 }
 
 impl<W> EventLoop for GliumWindow<W> {
