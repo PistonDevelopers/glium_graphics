@@ -150,6 +150,10 @@ impl<W> AdvancedWindow for GliumWindow<W>
     fn set_title(&mut self, title: String) {
         self.window.borrow_mut().set_title(title)
     }
+    fn get_automatic_close(&self) -> bool {self.window.borrow().get_automatic_close()}
+    fn set_automatic_close(&mut self, value: bool) {
+        self.window.borrow_mut().set_automatic_close(value);
+    }
     fn get_exit_on_esc(&self) -> bool { self.window.borrow().get_exit_on_esc() }
     fn set_exit_on_esc(&mut self, value: bool) {
         self.window.borrow_mut().set_exit_on_esc(value)
