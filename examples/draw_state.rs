@@ -18,7 +18,7 @@ fn main() {
     let (w, h) = (640, 480);
     let ref mut window: GliumWindow =
         WindowSettings::new("glium_graphics: image_test", [w, h])
-        .exit_on_esc(true).opengl(opengl).build().unwrap();
+        .exit_on_esc(true).graphics_api(opengl).build().unwrap();
 
     let mut blend = Blend::Alpha;
     let mut clip_inside = true;
