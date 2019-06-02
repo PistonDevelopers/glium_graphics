@@ -13,7 +13,7 @@ fn main() {
     let size = [500, 300];
     let ref mut window: GliumWindow =
         WindowSettings::new("gfx_graphics: text_test", size)
-        .exit_on_esc(true).opengl(opengl).build().unwrap();
+        .exit_on_esc(true).graphics_api(opengl).build().unwrap();
 
     let mut glyph_cache = GlyphCache::new(
         Path::new("assets/FiraSans-Regular.ttf"),

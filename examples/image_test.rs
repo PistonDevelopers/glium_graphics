@@ -16,7 +16,7 @@ fn main() {
     let (w, h) = (300, 300);
     let ref mut window: GliumWindow =
         WindowSettings::new("glium_graphics: image_test", [w, h])
-        .exit_on_esc(true).opengl(opengl).build().unwrap();
+        .exit_on_esc(true).graphics_api(opengl).build().unwrap();
 
     let rust_logo = Texture::from_path(window, "assets/rust.png",
         Flip::None, &TextureSettings::new()).unwrap();
