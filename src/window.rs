@@ -19,7 +19,7 @@ use self::piston::window::{
     Window,
     WindowSettings
 };
-use self::piston::input::{Event, Input};
+use self::piston::input::{Event, Input, TimeStamp};
 use self::glutin_window::GlutinWindow;
 
 #[derive(Clone)]
@@ -131,13 +131,13 @@ impl<W> Window for GliumWindow<W>
     fn size(&self) -> Size { self.window.borrow().size() }
     fn draw_size(&self) -> Size { self.window.borrow().draw_size() }
     fn swap_buffers(&mut self) { self.window.borrow_mut().swap_buffers() }
-    fn poll_event(&mut self) -> Option<Input> {
+    fn poll_event(&mut self) -> Option<(Input, Option<TimeStamp>)> {
         Window::poll_event(&mut *self.window.borrow_mut())
     }
-    fn wait_event(&mut self) -> Input {
+    fn wait_event(&mut self) -> (Input, Option<TimeStamp>) {
         Window::wait_event(&mut *self.window.borrow_mut())
     }
-    fn wait_event_timeout(&mut self, duration: Duration) -> Option<Input> {
+    fn wait_event_timeout(&mut self, duration: Duration) -> Option<(Input, Option<TimeStamp>)> {
         let mut window = self.window.borrow_mut();
         Window::wait_event_timeout(&mut *window, duration)
     }
