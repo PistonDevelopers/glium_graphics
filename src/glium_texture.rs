@@ -148,6 +148,13 @@ impl<F> UpdateTexture<F> for Texture
         offset: O,
         size: S
     ) -> Result<(), Self::Error> {
-        unimplemented!()
+        use glium::Rect;
+
+        let offset = offset.into();
+        let size = size.into();
+        let (_, h) = self.get_size();
+        self.0.write(Rect {left: offset[0], bottom: h - offset[1] - size[1], width: size[0], height: size[1]},
+                   RawImage2d::from_raw_rgba_reversed(memory, (size[0], size[1])));
+        Ok(())
     }
 }
