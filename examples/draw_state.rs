@@ -67,7 +67,8 @@ fn main() {
                 Blend::Alpha => Blend::Add,
                 Blend::Add => Blend::Multiply,
                 Blend::Multiply => Blend::Invert,
-                Blend::Invert => Blend::Alpha,
+                Blend::Invert => Blend::Lighter,
+                Blend::Lighter => Blend::Alpha,
             };
             println!("Changed blending to {:?}", blend);
         }

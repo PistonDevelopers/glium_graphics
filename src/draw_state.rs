@@ -108,6 +108,19 @@ pub fn convert_blend(blend: Option<draw_state::Blend>) -> glium::Blend {
                         constant_value: (0.0, 0.0, 0.0, 0.0)
                     }
                 }
+                Blend::Lighter => {
+                    glium::Blend {
+                        color: BlendingFunction::Addition {
+                            source: LinearBlendingFactor::SourceAlpha,
+                            destination: LinearBlendingFactor::One,
+                        },
+                        alpha: BlendingFunction::Addition {
+                            source: LinearBlendingFactor::Zero,
+                            destination: LinearBlendingFactor::One
+                        },
+                        constant_value: (0.0, 0.0, 0.0, 0.0)
+                    }
+                }
                 Blend::Add => {
                     glium::Blend {
                         color: BlendingFunction::Addition {
