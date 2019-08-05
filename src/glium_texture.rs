@@ -10,7 +10,7 @@ use glium::texture::{ RawImage2d, TextureCreationError };
 use glium::backend::Facade;
 #[cfg(feature = "image")]
 use self::image::{ DynamicImage, RgbaImage };
-use texture::{ self, TextureSettings, CreateTexture, UpdateTexture, Format };
+use texture::{ self, TextureSettings, CreateTexture, TextureOp, UpdateTexture, Format };
 
 /// Flip settings.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -115,11 +115,13 @@ impl ImageSize for Texture {
     }
 }
 
+impl<F> TextureOp<F> for Texture {
+    type Error = TextureCreationError;
+}
+
 impl<F> CreateTexture<F> for Texture
     where F: Facade
 {
-    type Error = TextureCreationError;
-
     fn create<S: Into<[u32; 2]>>(
         factory: &mut F,
         _format: Format,
@@ -137,8 +139,6 @@ impl<F> CreateTexture<F> for Texture
 impl<F> UpdateTexture<F> for Texture
     where F: Facade
 {
-    type Error = TextureCreationError;
-
     #[allow(unused_variables)]
     fn update<O: Into<[u32; 2]>, S: Into<[u32; 2]>>(
         &mut self,
