@@ -197,8 +197,8 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         use std::cmp::min;
         use glium::uniforms::{Sampler, SamplerWrapFunction};
 
-        let sampler = Sampler::new(&texture.0)
-            .wrap_function(SamplerWrapFunction::Clamp);
+        let mut sampler = Sampler::new(&texture.0);
+        sampler.1.wrap_function = (texture.1[0], texture.1[1], SamplerWrapFunction::Clamp);
 
         let color = gamma_srgb_to_linear(*color);
         if self.system.colored_offset > 0 {
