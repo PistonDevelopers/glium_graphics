@@ -7,6 +7,7 @@ use std::path::Path;
 use graphics::ImageSize;
 use glium::texture::srgb_texture2d::{ SrgbTexture2d };
 use glium::texture::{ RawImage2d, TextureCreationError };
+use glium::uniforms::SamplerWrapFunction;
 use glium::backend::Facade;
 #[cfg(feature = "image")]
 use self::image::{ DynamicImage, RgbaImage };
@@ -22,12 +23,12 @@ pub enum Flip {
 }
 
 /// Wrapper for 2D texture.
-pub struct Texture(pub SrgbTexture2d);
+pub struct Texture(pub SrgbTexture2d, pub [SamplerWrapFunction; 2]);
 
 impl Texture {
     /// Creates a new `Texture`.
     pub fn new(texture: SrgbTexture2d) -> Texture {
-        Texture(texture)
+        Texture(texture, [SamplerWrapFunction::Clamp; 2])
     }
 
     /// Returns empty texture.
@@ -127,12 +128,23 @@ impl<F> CreateTexture<F> for Texture
         _format: Format,
         memory: &[u8],
         size: S,
-        _settings: &TextureSettings
+        settings: &TextureSettings
     ) -> Result<Self, Self::Error> {
+        use texture::Wrap;
         let size = size.into();
+
+        let f = |wrap| match wrap {
+            Wrap::ClampToEdge => SamplerWrapFunction::Clamp,
+            Wrap::Repeat => SamplerWrapFunction::Repeat,
+            Wrap::MirroredRepeat => SamplerWrapFunction::Mirror,
+            Wrap::ClampToBorder => SamplerWrapFunction::Clamp,
+        };
+
+        let wrap_u = f(settings.get_wrap_u());
+        let wrap_v = f(settings.get_wrap_v());
         Ok(Texture(try!(SrgbTexture2d::new(factory,
                 RawImage2d::from_raw_rgba_reversed(memory,
-                    (size[0], size[1]))))))
+                    (size[0], size[1])))), [wrap_u, wrap_v]))
     }
 }
 
