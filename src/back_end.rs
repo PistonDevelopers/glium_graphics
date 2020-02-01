@@ -1,12 +1,10 @@
-use graphics::{ self, DrawState, Graphics, Viewport };
-use graphics::color::gamma_srgb_to_linear;
-use glium::{
-    Frame, Surface, Program, VertexBuffer,
-};
-use glium::index::{ NoIndices, PrimitiveType };
 use glium::backend::Facade;
-use shader_version::{ Shaders, OpenGL };
+use glium::index::{NoIndices, PrimitiveType};
+use glium::{Frame, Program, Surface, VertexBuffer};
+use graphics::color::gamma_srgb_to_linear;
+use graphics::{self, DrawState, Graphics, Viewport};
 use shader_version::glsl::GLSL;
+use shader_version::{OpenGL, Shaders};
 use Texture;
 
 use draw_state;
@@ -20,7 +18,6 @@ struct PlainVertex {
 }
 
 implement_vertex!(PlainVertex, color, pos);
-
 
 #[derive(Copy, Clone)]
 struct TexturedVertex {
@@ -44,44 +41,66 @@ pub struct Glium2d {
 
 impl Glium2d {
     /// Creates a new `Glium2d`.
-    pub fn new<W>(opengl: OpenGL, window: &W) -> Glium2d where W: Facade {
-        use shaders::{ colored, textured };
+    pub fn new<W>(opengl: OpenGL, window: &W) -> Glium2d
+    where
+        W: Facade,
+    {
+        use shaders::{colored, textured};
 
-        let src = |bytes| { unsafe { ::std::str::from_utf8_unchecked(bytes) } };
+        let src = |bytes| unsafe { ::std::str::from_utf8_unchecked(bytes) };
         let glsl = opengl.to_glsl();
 
-        let plain_buffer = VertexBuffer::empty_dynamic(window,
-            CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT).unwrap();
+        let plain_buffer =
+            VertexBuffer::empty_dynamic(window, CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT)
+                .unwrap();
         Glium2d {
             colored_offset: 0,
             colored_draw_state: Default::default(),
             plain_buffer: plain_buffer,
-            textured_buffer: VertexBuffer::empty_dynamic(window,
-                graphics::BACK_END_MAX_VERTEX_COUNT).unwrap(),
-            shader_texture:
-                Program::from_source(window,
-                    Shaders::new().set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
-                        .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE))
-                        .get(glsl).unwrap(),
-                    Shaders::new().set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
-                        .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE))
-                        .get(glsl).unwrap(),
-                    None).ok().expect("failed to initialize textured shader"),
-            shader_color:
-                Program::from_source(window,
-                    Shaders::new().set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
-                        .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE))
-                        .get(glsl).unwrap(),
-                    Shaders::new().set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
-                        .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE))
-                        .get(glsl).unwrap(),
-                    None).ok().expect("failed to initialize colored shader"),
+            textured_buffer: VertexBuffer::empty_dynamic(
+                window,
+                graphics::BACK_END_MAX_VERTEX_COUNT,
+            )
+            .unwrap(),
+            shader_texture: Program::from_source(
+                window,
+                Shaders::new()
+                    .set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
+                    .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE))
+                    .get(glsl)
+                    .unwrap(),
+                Shaders::new()
+                    .set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
+                    .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE))
+                    .get(glsl)
+                    .unwrap(),
+                None,
+            )
+            .ok()
+            .expect("failed to initialize textured shader"),
+            shader_color: Program::from_source(
+                window,
+                Shaders::new()
+                    .set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
+                    .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE))
+                    .get(glsl)
+                    .unwrap(),
+                Shaders::new()
+                    .set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
+                    .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE))
+                    .get(glsl)
+                    .unwrap(),
+                None,
+            )
+            .ok()
+            .expect("failed to initialize colored shader"),
         }
     }
 
     /// Renders 2D graphics.
-    pub fn draw<F, U>(&mut self, target: &mut Frame, viewport: Viewport, f: F) -> U where
-        F: FnOnce(graphics::Context, &mut GliumGraphics<Frame>) -> U
+    pub fn draw<F, U>(&mut self, target: &mut Frame, viewport: Viewport, f: F) -> U
+    where
+        F: FnOnce(graphics::Context, &mut GliumGraphics<Frame>) -> U,
     {
         use graphics::Context;
 
@@ -95,7 +114,6 @@ impl Glium2d {
     }
 }
 
-
 /// Graphics back-end.
 pub struct GliumGraphics<'d, 's, S: 's> {
     system: &'d mut Glium2d,
@@ -104,8 +122,7 @@ pub struct GliumGraphics<'d, 's, S: 's> {
 
 impl<'d, 's, S: Surface> GliumGraphics<'d, 's, S> {
     /// Creates a new graphics object.
-    pub fn new(system: &'d mut Glium2d, surface: &'s mut S)
-               -> GliumGraphics<'d, 's, S> {
+    pub fn new(system: &'d mut Glium2d, surface: &'s mut S) -> GliumGraphics<'d, 's, S> {
         GliumGraphics {
             system: system,
             surface: surface,
@@ -113,18 +130,22 @@ impl<'d, 's, S: Surface> GliumGraphics<'d, 's, S> {
     }
 
     fn flush_colored(&mut self) {
-        let slice = self.system.plain_buffer
-            .slice(0..self.system.colored_offset).unwrap();
+        let slice = self
+            .system
+            .plain_buffer
+            .slice(0..self.system.colored_offset)
+            .unwrap();
 
-        self.surface.draw(
-            slice,
-            &NoIndices(PrimitiveType::TrianglesList),
-            &self.system.shader_color,
-            &uniform! {},
-            &draw_state::convert_draw_state(&self.system.colored_draw_state),
-        )
-        .ok()
-        .expect("failed to draw triangle list");
+        self.surface
+            .draw(
+                slice,
+                &NoIndices(PrimitiveType::TrianglesList),
+                &self.system.shader_color,
+                &uniform! {},
+                &draw_state::convert_draw_state(&self.system.colored_draw_state),
+            )
+            .ok()
+            .expect("failed to draw triangle list");
 
         self.system.colored_offset = 0;
         self.system.plain_buffer.invalidate();
@@ -146,15 +167,10 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         self.surface.clear_stencil(value as i32);
     }
 
-
     /// Renders list of 2d triangles.
-    fn tri_list<F>(
-        &mut self,
-        draw_state: &DrawState,
-        color: &[f32; 4],
-        mut f: F
-    )
-        where F: FnMut(&mut FnMut(&[[f32; 2]]))
+    fn tri_list<F>(&mut self, draw_state: &DrawState, color: &[f32; 4], mut f: F)
+    where
+        F: FnMut(&mut FnMut(&[[f32; 2]])),
     {
         let color = gamma_srgb_to_linear(*color);
         // Flush when draw state changes.
@@ -167,10 +183,13 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             if self.system.colored_offset + n > CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT {
                 self.flush_colored();
             }
-            let slice = self.system.plain_buffer
-                .slice(self.system.colored_offset..self.system.colored_offset + n).unwrap();
+            let slice = self
+                .system
+                .plain_buffer
+                .slice(self.system.colored_offset..self.system.colored_offset + n)
+                .unwrap();
             slice.write({
-                &(0 .. n)
+                &(0..n)
                     .map(|i| PlainVertex {
                         color: color,
                         pos: vertices[i],
@@ -190,12 +209,12 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         draw_state: &DrawState,
         color: &[f32; 4],
         texture: &Texture,
-        mut f: F
-    )
-        where F: FnMut(&mut FnMut(&[[f32; 2]], &[[f32; 2]]))
+        mut f: F,
+    ) where
+        F: FnMut(&mut FnMut(&[[f32; 2]], &[[f32; 2]])),
     {
-        use std::cmp::min;
         use glium::uniforms::{Sampler, SamplerWrapFunction};
+        use std::cmp::min;
 
         let mut sampler = Sampler::new(&texture.0);
         sampler.1.wrap_function = (texture.1[0], texture.1[1], SamplerWrapFunction::Clamp);
@@ -211,7 +230,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
             let slice = self.system.textured_buffer.slice(0..len).unwrap();
 
             slice.write({
-                &(0 .. len)
+                &(0..len)
                     .map(|i| TexturedVertex {
                         pos: vertices[i],
                         // FIXME: The `1.0 - ...` is because of a wrong convention
@@ -220,18 +239,19 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     .collect::<Vec<_>>()
             });
 
-            self.surface.draw(
-                slice,
-                &NoIndices(PrimitiveType::TrianglesList),
-                &self.system.shader_texture,
-                &uniform! {
-                    color: color,
-                    s_texture: sampler
-                },
-                &draw_state::convert_draw_state(draw_state),
-            )
-            .ok()
-            .expect("failed to draw triangle list");
+            self.surface
+                .draw(
+                    slice,
+                    &NoIndices(PrimitiveType::TrianglesList),
+                    &self.system.shader_texture,
+                    &uniform! {
+                        color: color,
+                        s_texture: sampler
+                    },
+                    &draw_state::convert_draw_state(draw_state),
+                )
+                .ok()
+                .expect("failed to draw triangle list");
         })
     }
 }

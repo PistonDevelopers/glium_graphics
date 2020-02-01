@@ -1,12 +1,12 @@
-extern crate graphics;
-extern crate image as im;
 extern crate glium;
 extern crate glium_graphics;
+extern crate graphics;
+extern crate image as im;
 extern crate piston;
 
-use glium_graphics::{Glium2d, GliumWindow, Flip, OpenGL, Texture, TextureSettings, Wrap};
-use piston::input::{Button, Key, RenderEvent, PressEvent};
-use piston::event_loop::{EventLoop};
+use glium_graphics::{Flip, Glium2d, GliumWindow, OpenGL, Texture, TextureSettings, Wrap};
+use piston::event_loop::EventLoop;
+use piston::input::{Button, Key, PressEvent, RenderEvent};
 use piston::window::WindowSettings;
 
 fn main() {
@@ -34,8 +34,13 @@ fn main() {
     let mut texture_settings = TextureSettings::new();
     texture_settings.set_border_color([0.0, 0.0, 0.0, 1.0]);
 
-    let mut rust_logo = Texture::from_path(&mut window, "assets/rust.png",
-        Flip::None, &texture_settings).unwrap();
+    let mut rust_logo = Texture::from_path(
+        &mut window,
+        "assets/rust.png",
+        Flip::None,
+        &texture_settings,
+    )
+    .unwrap();
 
     let mut g2d = Glium2d::new(opengl, &mut window);
     while let Some(e) = window.next() {
@@ -69,8 +74,13 @@ fn main() {
         if let Some(Button::Keyboard(Key::U)) = e.press_args() {
             ix_u = (ix_u + 1) % wrap_modes.len();
             texture_settings.set_wrap_u(wrap_modes[ix_u]);
-            rust_logo = Texture::from_path(&mut window, "assets/rust.png",
-                                           Flip::None, &texture_settings).unwrap();
+            rust_logo = Texture::from_path(
+                &mut window,
+                "assets/rust.png",
+                Flip::None,
+                &texture_settings,
+            )
+            .unwrap();
             println!(
                 "Changed texture wrap mode for u coordinate to: {:?}",
                 wrap_modes[ix_u]
@@ -80,8 +90,13 @@ fn main() {
         if let Some(Button::Keyboard(Key::V)) = e.press_args() {
             ix_v = (ix_v + 1) % wrap_modes.len();
             texture_settings.set_wrap_v(wrap_modes[ix_v]);
-            rust_logo = Texture::from_path(&mut window, "assets/rust.png",
-                                           Flip::None, &texture_settings).unwrap();
+            rust_logo = Texture::from_path(
+                &mut window,
+                "assets/rust.png",
+                Flip::None,
+                &texture_settings,
+            )
+            .unwrap();
             println!(
                 "Changed texture wrap mode for v coordinate to: {:?}",
                 wrap_modes[ix_v]

@@ -17,12 +17,12 @@ pub use window::GliumWindow;
 /// Stores textures for text rendering.
 pub type GlyphCache<'a, F> = graphics::glyph_cache::rusttype::GlyphCache<'a, F, Texture>;
 
-pub use back_end::{ Glium2d, GliumGraphics };
+pub use back_end::{Glium2d, GliumGraphics};
+pub use glium_texture::{Flip, Texture};
 pub use texture::*;
-pub use glium_texture::{ Flip, Texture };
 
 mod back_end;
-#[cfg(feature = "glium_window")]
-mod window;
 mod draw_state;
 mod glium_texture;
+#[cfg(feature = "glium_window")]
+mod window;
