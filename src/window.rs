@@ -51,7 +51,7 @@ impl<W> BuildFromWindowSettings for GliumWindow<W>
 where
     W: 'static + Window + OpenGLWindow + BuildFromWindowSettings,
 {
-    fn build_from_window_settings(settings: &WindowSettings) -> Result<GliumWindow<W>, Box<Error>> {
+    fn build_from_window_settings(settings: &WindowSettings) -> Result<GliumWindow<W>, Box<dyn Error>> {
         // Turn on sRGB.
         let settings = settings.clone().srgb(true);
         let window: W = settings.build()?;
