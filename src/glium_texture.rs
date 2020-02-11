@@ -57,7 +57,7 @@ impl Texture {
         F: Facade,
         P: AsRef<Path>,
     {
-        let img = try!(image::open(path).map_err(|e| e.to_string()));
+        let img = image::open(path).map_err(|e| e.to_string())?;
 
         let img = match img {
             DynamicImage::ImageRgba8(img) => img,
@@ -157,10 +157,10 @@ where
         let wrap_u = f(settings.get_wrap_u());
         let wrap_v = f(settings.get_wrap_v());
         Ok(Texture(
-            try!(SrgbTexture2d::new(
+            SrgbTexture2d::new(
                 factory,
                 RawImage2d::from_raw_rgba_reversed(memory, (size[0], size[1]))
-            )),
+            )?,
             [wrap_u, wrap_v],
         ))
     }

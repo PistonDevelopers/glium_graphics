@@ -170,7 +170,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
     /// Renders list of 2d triangles.
     fn tri_list<F>(&mut self, draw_state: &DrawState, color: &[f32; 4], mut f: F)
     where
-        F: FnMut(&mut FnMut(&[[f32; 2]])),
+        F: FnMut(&mut dyn FnMut(&[[f32; 2]])),
     {
         let color = gamma_srgb_to_linear(*color);
         // Flush when draw state changes.
@@ -211,7 +211,7 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         texture: &Texture,
         mut f: F,
     ) where
-        F: FnMut(&mut FnMut(&[[f32; 2]], &[[f32; 2]])),
+        F: FnMut(&mut dyn FnMut(&[[f32; 2]], &[[f32; 2]])),
     {
         use glium::uniforms::{Sampler, SamplerWrapFunction};
         use std::cmp::min;
