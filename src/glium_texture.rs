@@ -151,7 +151,7 @@ where
             Wrap::ClampToEdge => SamplerWrapFunction::Clamp,
             Wrap::Repeat => SamplerWrapFunction::Repeat,
             Wrap::MirroredRepeat => SamplerWrapFunction::Mirror,
-            Wrap::ClampToBorder => SamplerWrapFunction::Clamp,
+            Wrap::ClampToBorder => SamplerWrapFunction::BorderClamp,
         };
 
         let wrap_u = f(settings.get_wrap_u());

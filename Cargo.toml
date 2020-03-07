@@ -1,6 +1,6 @@
 [package]
 name = "piston2d-glium_graphics"
-version = "0.74.0"
+version = "0.75.0"
 authors = [
     "Eduard Bopp <eduard.bopp@aepsil0n.de>",
     "bvssvni <bvssvni@gmail.com>"
@@ -21,7 +21,7 @@ glium_window = ["piston", "pistoncore-glutin_window"]
 check_current_window = []
 
 [dependencies.glium]
-version = "0.25.0"
+version = "0.26.0"
 default_features = false
 
 [dependencies]
