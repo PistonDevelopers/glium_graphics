@@ -52,9 +52,7 @@ where
     W: 'static + Window + OpenGLWindow + BuildFromWindowSettings,
 {
     fn build_from_window_settings(settings: &WindowSettings) -> Result<GliumWindow<W>, Box<dyn Error>> {
-        // Turn on sRGB.
-        let settings = settings.clone().srgb(true);
-        let window: W = settings.build()?;
+        let window: W = settings.clone().build()?;
         GliumWindow::new(&Rc::new(RefCell::new(window))).map_err(|err| err.into())
     }
 }
