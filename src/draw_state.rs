@@ -48,6 +48,7 @@ pub fn convert_stencil(stencil: Option<draw_state::Stencil>) -> glium::draw_para
                         StencilOperation::Keep,
                         val,
                     ),
+                    Stencil::Increment => (StencilTest::AlwaysFail, StencilOperation::Increment, 0),
                 }
             };
 
