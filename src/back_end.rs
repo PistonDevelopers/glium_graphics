@@ -27,6 +27,15 @@ struct TexturedVertex {
 
 implement_vertex!(TexturedVertex, pos, uv);
 
+#[derive(Copy, Clone)]
+struct TexturedColorVertex {
+    pos: [f32; 2],
+    uv: [f32; 2],
+    color: [f32; 4],
+}
+
+implement_vertex!(TexturedColorVertex, pos, uv, color);
+
 /// The resources needed for rendering 2D.
 pub struct Glium2d {
     // The offset in vertices for colored rendering.
@@ -35,6 +44,8 @@ pub struct Glium2d {
     colored_draw_state: DrawState,
     plain_buffer: VertexBuffer<PlainVertex>,
     textured_buffer: VertexBuffer<TexturedVertex>,
+    textured_color_buffer: VertexBuffer<TexturedColorVertex>,
+    shader_texture_color: Program,
     shader_texture: Program,
     shader_color: Program,
 }
@@ -45,7 +56,7 @@ impl Glium2d {
     where
         W: Facade,
     {
-        use shaders::{colored, textured};
+        use shaders::{colored, textured, textured_color};
 
         let src = |bytes| unsafe { ::std::str::from_utf8_unchecked(bytes) };
         let glsl = opengl.to_glsl();
@@ -62,6 +73,27 @@ impl Glium2d {
                 graphics::BACK_END_MAX_VERTEX_COUNT,
             )
             .unwrap(),
+            textured_color_buffer: VertexBuffer::empty_dynamic(
+                window,
+                graphics::BACK_END_MAX_VERTEX_COUNT,
+            )
+            .unwrap(),
+            shader_texture_color: Program::from_source(
+                window,
+                Shaders::new()
+                    .set(GLSL::V1_20, src(textured_color::VERTEX_GLSL_120))
+                    .set(GLSL::V1_50, src(textured_color::VERTEX_GLSL_150_CORE))
+                    .get(glsl)
+                    .unwrap(),
+                Shaders::new()
+                    .set(GLSL::V1_20, src(textured_color::FRAGMENT_GLSL_120))
+                    .set(GLSL::V1_50, src(textured_color::FRAGMENT_GLSL_150_CORE))
+                    .get(glsl)
+                    .unwrap(),
+                None,
+            )
+            .ok()
+            .expect("failed to initialize textured color shader"),
             shader_texture: Program::from_source(
                 window,
                 Shaders::new()
@@ -200,6 +232,37 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
         })
     }
 
+    fn tri_list_c<F>(&mut self, draw_state: &DrawState, mut f: F)
+    where
+        F: FnMut(&mut dyn FnMut(&[[f32; 2]], &[[f32; 4]])),
+    {
+        // Flush when draw state changes.
+        if &self.system.colored_draw_state != draw_state {
+            self.flush_colored();
+            self.system.colored_draw_state = *draw_state;
+        }
+        f(&mut |vertices: &[[f32; 2]], colors: &[[f32; 4]]| {
+            let n = vertices.len();
+            if self.system.colored_offset + n > CHUNKS * graphics::BACK_END_MAX_VERTEX_COUNT {
+                self.flush_colored();
+            }
+            let slice = self
+                .system
+                .plain_buffer
+                .slice(self.system.colored_offset..self.system.colored_offset + n)
+                .unwrap();
+            slice.write({
+                &(0..n)
+                    .map(|i| PlainVertex {
+                        color: gamma_srgb_to_linear(colors[i]),
+                        pos: vertices[i],
+                    })
+                    .collect::<Vec<_>>()
+            });
+            self.system.colored_offset += n;
+        })
+    }
+
     /// Renders list of 2d triangles.
     ///
     /// A texture coordinate is assigned per vertex.
@@ -246,6 +309,55 @@ impl<'d, 's, S: Surface> Graphics for GliumGraphics<'d, 's, S> {
                     &self.system.shader_texture,
                     &uniform! {
                         color: color,
+                        s_texture: sampler
+                    },
+                    &draw_state::convert_draw_state(draw_state),
+                )
+                .ok()
+                .expect("failed to draw triangle list");
+        })
+    }
+
+    fn tri_list_uv_c<F>(
+        &mut self,
+        draw_state: &DrawState,
+        texture: &Texture,
+        mut f: F,
+    ) where
+        F: FnMut(&mut dyn FnMut(&[[f32; 2]], &[[f32; 2]], &[[f32; 4]])),
+    {
+        use glium::uniforms::{Sampler, SamplerWrapFunction};
+        use std::cmp::min;
+
+        let mut sampler = Sampler::new(&texture.0);
+        sampler.1.wrap_function = (texture.1[0], texture.1[1], SamplerWrapFunction::Clamp);
+
+        if self.system.colored_offset > 0 {
+            self.flush_colored();
+        }
+        f(&mut |vertices: &[[f32; 2]], texture_coords: &[[f32; 2]], colors: &[[f32; 4]]| {
+            let len = min(min(vertices.len(), texture_coords.len()), colors.len());
+
+            self.system.textured_color_buffer.invalidate();
+            let slice = self.system.textured_color_buffer.slice(0..len).unwrap();
+
+            slice.write({
+                &(0..len)
+                    .map(|i| TexturedColorVertex {
+                        pos: vertices[i],
+                        // FIXME: The `1.0 - ...` is because of a wrong convention
+                        uv: [texture_coords[i][0], 1.0 - texture_coords[i][1]],
+                        color: gamma_srgb_to_linear(colors[i]),
+                    })
+                    .collect::<Vec<_>>()
+            });
+
+            self.surface
+                .draw(
+                    slice,
+                    &NoIndices(PrimitiveType::TrianglesList),
+                    &self.system.shader_texture_color,
+                    &uniform! {
                         s_texture: sampler
                     },
                     &draw_state::convert_draw_state(draw_state),
